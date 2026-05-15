@@ -1,29 +1,25 @@
-import unittest
+import pytest
+
 from data_structures.trie_demo import Trie
 
-class TestTrie(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        cls.trie = Trie()
-        # Load words from the words.txt file in the data folder
-        with open('data/words.txt', 'r') as file:
-            words = file.read().splitlines()
-            for word in words:
-                cls.trie.insert(word)
+@pytest.fixture(scope="module")
+def trie():
+    trie = Trie()
+    with open("data/words.txt", "r") as file:
+        for word in file.read().splitlines():
+            trie.insert(word)
+    return trie
 
-    def test_search_common_words(self):
-        # Test search for common words
-        self.assertTrue(self.trie.search("apple"))
-        self.assertTrue(self.trie.search("banana"))
-        self.assertTrue(self.trie.search("orange"))
-        self.assertFalse(self.trie.search("notaword"))
 
-    def test_starts_with_prefix(self):
-        # Test prefix matching
-        self.assertTrue(self.trie.starts_with("app"))
-        self.assertTrue(self.trie.starts_with("ban"))
-        self.assertFalse(self.trie.starts_with("xyz"))
+def test_search_common_words(trie):
+    assert trie.search("apple")
+    assert trie.search("banana")
+    assert trie.search("orange")
+    assert not trie.search("notaword")
 
-if __name__ == '__main__':
-    unittest.main()
+
+def test_starts_with_prefix(trie):
+    assert trie.starts_with("app")
+    assert trie.starts_with("ban")
+    assert not trie.starts_with("xyz")

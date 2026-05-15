@@ -46,4 +46,20 @@ class Graph:
 
         dfs_recursive(start_vertex)
         return traversal
-    
+
+    def dfs_iterative(self, start_vertex):
+        """Perform Depth-First Search (DFS) using an explicit stack."""
+        visited = set()
+        stack = [start_vertex]
+        traversal = []
+
+        while stack:
+            vertex = stack.pop()
+            if vertex not in visited:
+                traversal.append(vertex)
+                visited.add(vertex)
+                for neighbor in reversed(self.adjacency_list[vertex]):
+                    if neighbor not in visited:
+                        stack.append(neighbor)
+
+        return traversal

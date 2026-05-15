@@ -1,57 +1,58 @@
-import unittest
+import pytest
+
 from data_structures.list_demo import ListDemo
 
-class TestListDemo(unittest.TestCase):
 
-    def setUp(self):
-        self.lst = ListDemo()
+ITEMS = [10, 20]
+UPDATED_ITEM = 30
 
-    def test_add_and_get(self):
-        self.lst.add(10)
-        self.lst.add(20)
-        # Confirm items were added correctly
-        self.assertEqual(self.lst.get(0), 10)
-        self.assertEqual(self.lst.get(1), 20)
 
-    def test_remove_by_value(self):
-        self.lst.add(10)
-        self.lst.add(20)
-        self.lst.remove(10)
-        # Confirm the item was removed
-        with self.assertRaises(IndexError):
-            self.lst.get(1)  # Only one item should remain
-        self.assertEqual(self.lst.get(0), 20)
+@pytest.fixture
+def list_demo():
+    return ListDemo()
 
-    def test_remove_by_index(self):
-        self.lst.add(10)
-        self.lst.add(20)
-        removed_item = self.lst.remove_at(0)
-        # Confirm the correct item was removed
-        self.assertEqual(removed_item, 10)
-        self.assertEqual(self.lst.get(0), 20)
 
-    def test_update(self):
-        self.lst.add(10)
-        self.lst.add(20)
-        self.lst.update(0, 30)
-        # Confirm the item was updated
-        self.assertEqual(self.lst.get(0), 30)
+def add_items(list_demo, items):
+    for item in items:
+        list_demo.add(item)
 
-    def test_size(self):
-        self.lst.add(10)
-        self.lst.add(20)
-        # Confirm the size of the list
-        self.assertEqual(self.lst.size(), 2)
-        self.lst.remove_at(0)
-        self.assertEqual(self.lst.size(), 1)
 
-    def test_out_of_range_access(self):
-        # Check out of range indexing and removing
-        with self.assertRaises(IndexError):
-            self.lst.get(0)
-        with self.assertRaises(IndexError):
-            self.lst.remove_at(0)
+def test_add_and_get(list_demo):
+    add_items(list_demo, ITEMS)
+    for index, item in enumerate(ITEMS):
+        assert list_demo.get(index) == item
 
-if __name__ == '__main__':
-    unittest.main()
-    
+
+def test_remove_by_value(list_demo):
+    add_items(list_demo, ITEMS)
+    removed_item = ITEMS[0]
+    list_demo.remove(removed_item)
+    with pytest.raises(IndexError):
+        list_demo.get(len(ITEMS) - 1)
+    assert list_demo.get(0) == ITEMS[1]
+
+
+def test_remove_by_index(list_demo):
+    add_items(list_demo, ITEMS)
+    assert list_demo.remove_at(0) == ITEMS[0]
+    assert list_demo.get(0) == ITEMS[1]
+
+
+def test_update(list_demo):
+    add_items(list_demo, ITEMS)
+    list_demo.update(0, UPDATED_ITEM)
+    assert list_demo.get(0) == UPDATED_ITEM
+
+
+def test_size(list_demo):
+    add_items(list_demo, ITEMS)
+    assert list_demo.size() == len(ITEMS)
+    list_demo.remove_at(0)
+    assert list_demo.size() == len(ITEMS) - 1
+
+
+def test_out_of_range_access(list_demo):
+    with pytest.raises(IndexError):
+        list_demo.get(0)
+    with pytest.raises(IndexError):
+        list_demo.remove_at(0)

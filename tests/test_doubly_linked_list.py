@@ -1,54 +1,56 @@
-import unittest
+import pytest
+
 from data_structures.doubly_linked_list import DoublyLinkedList
 
-class TestDoublyLinkedList(unittest.TestCase):
 
-    def setUp(self):
-        self.linked_list = DoublyLinkedList()
+ITEMS = [10, 20, 30]
+REMOVED_ITEM = ITEMS[1]
+MISSING_ITEM = 40
 
-    def test_insert_and_display_forward(self):
-        self.linked_list.insert(10)
-        self.linked_list.insert(20)
-        self.linked_list.insert(30)
-        # Verify the elements are inserted and displayed in forward order
-        self.assertEqual(self.linked_list.display_forward(), [10, 20, 30])
 
-    def test_display_backward(self):
-        self.linked_list.insert(10)
-        self.linked_list.insert(20)
-        self.linked_list.insert(30)
-        # Verify the elements are displayed in reverse order
-        self.assertEqual(self.linked_list.display_backward(), [30, 20, 10])
+@pytest.fixture
+def linked_list():
+    return DoublyLinkedList()
 
-    def test_remove(self):
-        self.linked_list.insert(10)
-        self.linked_list.insert(20)
-        self.linked_list.insert(30)
-        self.linked_list.remove(20)
-        # Verify the element is removed correctly
-        self.assertEqual(self.linked_list.display_forward(), [10, 30])
 
-    def test_search(self):
-        self.linked_list.insert(10)
-        self.linked_list.insert(20)
-        self.linked_list.insert(30)
-        # Verify search works
-        self.assertTrue(self.linked_list.search(20))
-        self.assertFalse(self.linked_list.search(40))
+def insert_items(linked_list, items):
+    for item in items:
+        linked_list.insert(item)
 
-    def test_size(self):
-        self.linked_list.insert(10)
-        self.linked_list.insert(20)
-        # Verify the size of the linked list
-        self.assertEqual(self.linked_list.size(), 2)
-        self.linked_list.remove(10)
-        self.assertEqual(self.linked_list.size(), 1)
 
-    def test_remove_value_not_found(self):
-        self.linked_list.insert(10)
-        with self.assertRaises(ValueError):
-            self.linked_list.remove(30)
+def test_insert_and_display_forward(linked_list):
+    insert_items(linked_list, ITEMS)
+    assert linked_list.display_forward() == ITEMS
 
-if __name__ == '__main__':
-    unittest.main()
-    
+
+def test_display_backward(linked_list):
+    insert_items(linked_list, ITEMS)
+    assert linked_list.display_backward() == list(reversed(ITEMS))
+
+
+def test_remove(linked_list):
+    insert_items(linked_list, ITEMS)
+    linked_list.remove(REMOVED_ITEM)
+    assert linked_list.display_forward() == [
+        item for item in ITEMS if item != REMOVED_ITEM
+    ]
+
+
+def test_search(linked_list):
+    insert_items(linked_list, ITEMS)
+    assert linked_list.search(REMOVED_ITEM)
+    assert not linked_list.search(MISSING_ITEM)
+
+
+def test_size(linked_list):
+    inserted_items = ITEMS[:2]
+    insert_items(linked_list, inserted_items)
+    assert linked_list.size() == len(inserted_items)
+    linked_list.remove(inserted_items[0])
+    assert linked_list.size() == len(inserted_items) - 1
+
+
+def test_remove_value_not_found(linked_list):
+    linked_list.insert(ITEMS[0])
+    with pytest.raises(ValueError):
+        linked_list.remove(MISSING_ITEM)
