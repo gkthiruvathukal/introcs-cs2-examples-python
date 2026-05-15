@@ -20,7 +20,7 @@ Use standard Python style with 4-space indentation. Keep modules focused on one 
 
 ## Testing Guidelines
 
-The project uses pytest. Add or update tests whenever behavior changes. Match each source module with a corresponding `tests/test_<module>.py` file. Test functions must start with `test_` so discovery finds them. Use `pytest.raises(...)` for expected exceptions. Cover normal operations, boundary cases, and expected failures, such as popping from an empty stack or searching for missing data.
+The project uses pytest. Add or update tests whenever behavior changes. Match each source module with a corresponding `tests/test_<module>.py` file. Test functions must start with `test_` so discovery finds them. Use `pytest.raises(...)` for expected exceptions, including Python's built-in `RecursionError` where recursive demos can exceed the interpreter recursion limit. Keep tests data-driven with shared constants or helpers when expected sizes and values derive from setup data.
 
 ## Commit & Pull Request Guidelines
 
@@ -30,4 +30,4 @@ Pull requests should include a brief description, the data structures or tests c
 
 ## Agent-Specific Instructions
 
-Keep changes small and educational. Preserve the lightweight pytest workflow unless a task explicitly calls for broader tooling.
+Keep changes small and educational. Preserve the lightweight pytest workflow unless a task explicitly calls for broader tooling. When adding recursive algorithms, rely on Python's normal recursion behavior and add an explicit-stack iterative alternative when it has teaching value.
