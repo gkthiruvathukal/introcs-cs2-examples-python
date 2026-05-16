@@ -3,7 +3,7 @@ PYTEST  = .venv/bin/pytest
 
 # Convenience short aliases
 RUN_ALIASES  = run-bst run-deque run-dict run-dll run-graph run-heap \
-               run-list run-networkx run-queue run-set run-sll run-stack run-trie
+               run-list run-networkx run-queue run-set run-sll run-stack run-stack-tui run-trie
 TEST_ALIASES = test-bst test-deque test-dict test-dll test-graph test-heap \
                test-list test-networkx test-queue test-set test-sll test-stack test-trie
 
@@ -33,7 +33,8 @@ run-networkx: run-networkx_graph_demo
 run-queue:   run-queue_demo
 run-set:     run-set_demo
 run-sll:     run-singly_linked_list
-run-stack:   run-stack_demo
+run-stack:     run-stack_demo
+run-stack-tui: run-stack_demo_tui
 run-trie:    run-trie_demo
 
 test-bst:     test-binary_search_tree_demo
@@ -59,7 +60,7 @@ test-trie:    test-trie_demo
 #     doubly_linked_list        graph_demo         heap_demo
 #     list_demo                 networkx_graph_demo  queue_demo
 #     set_demo                  singly_linked_list   stack_demo
-#     trie_demo
+#     stack_demo_tui            trie_demo
 run-%:
 	$(PYTHON) -m data_structures.$*
 
@@ -70,6 +71,6 @@ run-%:
 #     doubly_linked_list        graph_demo         heap_demo
 #     list_demo                 networkx_graph_demo  queue_demo
 #     set_demo                  singly_linked_list   stack_demo
-#     trie_demo
+#     stack_demo_tui            trie_demo
 test-%:
 	$(PYTEST) tests/test_$*.py -v

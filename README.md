@@ -26,7 +26,7 @@ make test-stack
 make run-stack
 ```
 
-`stack_demo` launches an interactive Textual TUI. Other demo modules do not yet have a `__main__` block, so their `run-*` targets verify a clean import but produce no output.
+`stack_demo_tui` launches an interactive Textual TUI (`make run-stack-tui`). Other demo modules do not yet have a `__main__` block, so their `run-*` targets verify a clean import but produce no output.
 
 ## All Valid Targets
 
@@ -53,4 +53,5 @@ Valid `<name>` values (short alias or full name both work):
 | `set` | `set_demo` | `data_structures/set_demo.py` | `tests/test_set_demo.py` |
 | `sll` | `singly_linked_list` | `data_structures/singly_linked_list.py` | `tests/test_singly_linked_list.py` |
 | `stack` | `stack_demo` | `data_structures/stack_demo.py` | `tests/test_stack_demo.py` |
+| `stack-tui` | `stack_demo_tui` | `data_structures/stack_demo_tui.py` | — |
 | `trie` | `trie_demo` | `data_structures/trie_demo.py` | `tests/test_trie_demo.py` |
