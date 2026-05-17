@@ -1,5 +1,6 @@
 from collections import deque
 
+
 class QueueDemo:
     def __init__(self):
         """Initialize an empty queue using deque."""
@@ -28,4 +29,39 @@ class QueueDemo:
     def size(self):
         """Return the size of the queue."""
         return len(self.queue)
+
+    def clear(self):
+        """Remove all items from the queue."""
+        self.queue.clear()
+
+    def swap(self):
+        """Swap the front two items in the queue."""
+        if len(self.queue) < 2:
+            raise IndexError("Swap requires at least two items")
+        first = self.queue[0]
+        second = self.queue[1]
+        self.queue[0], self.queue[1] = second, first
+        return self.queue[0], self.queue[1]
+
+    def rotate(self):
+        """Rotate the front three items so the third becomes the new front."""
+        if len(self.queue) < 3:
+            raise IndexError("Rotate requires at least three items")
+        first = self.queue.popleft()
+        second = self.queue.popleft()
+        third = self.queue.popleft()
+        self.queue.appendleft(second)
+        self.queue.appendleft(first)
+        self.queue.appendleft(third)
+        return [self.queue[0], self.queue[1], self.queue[2]]
+
+    def at(self, index):
+        """Return the value at zero-based offset from the front."""
+        if index < 0 or index >= len(self.queue):
+            raise IndexError("Index out of range")
+        return self.queue[index]
+
+    def to_list(self):
+        """Return the queue contents from front to back."""
+        return list(self.queue)
     
