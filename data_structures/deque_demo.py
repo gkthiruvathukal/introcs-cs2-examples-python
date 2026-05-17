@@ -1,5 +1,6 @@
 from collections import deque
 
+
 class DequeDemo:
     def __init__(self):
         """Initialize an empty deque"""
@@ -54,4 +55,18 @@ class DequeDemo:
     def size(self):
         """Return the size of the deque"""
         return len(self.dq)
+
+    def clear(self):
+        """Remove all items from the deque."""
+        self.dq.clear()
+
+    def at(self, index):
+        """Return the value at zero-based offset from the front."""
+        if index < 0 or index >= len(self.dq):
+            raise IndexError("Index out of range")
+        return self.dq[index]
+
+    def to_list(self):
+        """Return the deque contents from front to back."""
+        return list(self.dq)
     

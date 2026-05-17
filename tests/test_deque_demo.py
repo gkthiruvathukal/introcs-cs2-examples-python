@@ -56,3 +56,19 @@ def test_update_empty(deque_demo):
         deque_demo.update_front(1)
     with pytest.raises(IndexError):
         deque_demo.update_back(1)
+
+
+def test_at_and_to_list(deque_demo):
+    deque_demo.add_to_front(FRONT_ITEM)
+    deque_demo.add_to_back(BACK_ITEM)
+    assert deque_demo.at(0) == FRONT_ITEM
+    assert deque_demo.at(1) == BACK_ITEM
+    assert deque_demo.to_list() == ITEMS
+
+
+def test_clear(deque_demo):
+    deque_demo.add_to_front(FRONT_ITEM)
+    deque_demo.add_to_back(BACK_ITEM)
+    deque_demo.clear()
+    assert deque_demo.size() == 0
+    assert deque_demo.to_list() == []
