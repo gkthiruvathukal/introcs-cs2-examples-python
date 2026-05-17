@@ -26,9 +26,23 @@ make test-stack
 make run-stack
 ```
 
-`stack_demo_tui` launches an interactive Textual TUI (`make run-stack-tui`). Other demo modules do not yet have a `__main__` block, so their `run-*` targets verify a clean import but produce no output.
+The repo now includes interactive Textual TUIs for:
+- `stack_demo_tui`
+- `queue_demo_tui`
+- `deque_demo_tui`
+- `list_demo_tui`
+- `singly_linked_list_tui`
+- `doubly_linked_list_tui`
 
-For a walkthrough of the interactive stack app, including commands, keybindings, and `--view-top`, see `docs/StackTUI.md`.
+Use targets such as `make run-stack-tui`, `make run-queue-tui`, or `make run-dll-tui`. Other demo modules do not yet have a `__main__` block, so their `run-*` targets verify a clean import but produce no output.
+
+For walkthroughs of the interactive apps, see:
+- `docs/StackTUI.md`
+- `docs/QueueTUI.md`
+- `docs/DequeTUI.md`
+- `docs/ListTUI.md`
+- `docs/SinglyLinkedListTUI.md`
+- `docs/DoublyLinkedListTUI.md`
 
 ## All Valid Targets
 
@@ -52,8 +66,13 @@ Valid `<name>` values (short alias or full name both work):
 | `list` | `list_demo` | `data_structures/list_demo.py` | `tests/test_list_demo.py` |
 | `networkx` | `networkx_graph_demo` | `data_structures/networkx_graph_demo.py` | `tests/test_networkx_graph_demo.py` |
 | `queue` | `queue_demo` | `data_structures/queue_demo.py` | `tests/test_queue_demo.py` |
+| `queue-tui` | `queue_demo_tui` | `data_structures/queue_demo_tui.py` | `tests/test_queue_demo_tui.py` |
 | `set` | `set_demo` | `data_structures/set_demo.py` | `tests/test_set_demo.py` |
 | `sll` | `singly_linked_list` | `data_structures/singly_linked_list.py` | `tests/test_singly_linked_list.py` |
+| `sll-tui` | `singly_linked_list_tui` | `data_structures/singly_linked_list_tui.py` | `tests/test_singly_linked_list_tui.py` |
 | `stack` | `stack_demo` | `data_structures/stack_demo.py` | `tests/test_stack_demo.py` |
 | `stack-tui` | `stack_demo_tui` | `data_structures/stack_demo_tui.py` | `tests/test_stack_demo_tui.py` |
+| `deque-tui` | `deque_demo_tui` | `data_structures/deque_demo_tui.py` | `tests/test_deque_demo_tui.py` |
+| `list-tui` | `list_demo_tui` | `data_structures/list_demo_tui.py` | `tests/test_list_demo_tui.py` |
+| `dll-tui` | `doubly_linked_list_tui` | `data_structures/doubly_linked_list_tui.py` | `tests/test_doubly_linked_list_tui.py` |
 | `trie` | `trie_demo` | `data_structures/trie_demo.py` | `tests/test_trie_demo.py` |

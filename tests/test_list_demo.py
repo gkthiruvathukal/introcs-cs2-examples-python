@@ -56,3 +56,16 @@ def test_out_of_range_access(list_demo):
         list_demo.get(0)
     with pytest.raises(IndexError):
         list_demo.remove_at(0)
+
+
+def test_insert_and_to_list(list_demo):
+    add_items(list_demo, [ITEMS[0]])
+    list_demo.insert(1, ITEMS[1])
+    assert list_demo.to_list() == ITEMS
+
+
+def test_clear(list_demo):
+    add_items(list_demo, ITEMS)
+    list_demo.clear()
+    assert list_demo.size() == 0
+    assert list_demo.to_list() == []

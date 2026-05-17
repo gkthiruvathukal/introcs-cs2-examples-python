@@ -7,6 +7,13 @@ class ListDemo:
         """Add an item to the list."""
         self.lst.append(item)
 
+    def insert(self, index, item):
+        """Insert an item at the given index."""
+        if 0 <= index <= len(self.lst):
+            self.lst.insert(index, item)
+        else:
+            raise IndexError("Index out of range")
+
     def remove(self, item):
         """Remove an item from the list by value."""
         if item in self.lst:
@@ -38,4 +45,12 @@ class ListDemo:
     def size(self):
         """Return the size of the list."""
         return len(self.lst)
+
+    def clear(self):
+        """Remove all items from the list."""
+        self.lst.clear()
+
+    def to_list(self):
+        """Return a shallow copy of the list contents."""
+        return list(self.lst)
     
