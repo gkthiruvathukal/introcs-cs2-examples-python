@@ -54,3 +54,20 @@ def test_remove_value_not_found(linked_list):
     linked_list.insert(ITEMS[0])
     with pytest.raises(ValueError):
         linked_list.remove(MISSING_ITEM)
+
+
+def test_to_list_and_clear(linked_list):
+    insert_items(linked_list, ITEMS)
+    assert linked_list.to_list() == ITEMS
+    linked_list.clear()
+    assert linked_list.to_list() == []
+    assert linked_list.size() == 0
+
+
+def test_node_snapshots_include_stable_node_labels_and_links(linked_list):
+    insert_items(linked_list, ITEMS[:2])
+    snapshots = linked_list.node_snapshots()
+    assert snapshots == [
+        {"node_id": 1, "node_label": "node-1", "data": 10, "prev_label": "/", "next_label": "node-2"},
+        {"node_id": 2, "node_label": "node-2", "data": 20, "prev_label": "node-1", "next_label": "/"},
+    ]
