@@ -1,7 +1,9 @@
+import asyncio
 import random
 from pathlib import Path
 
 import pytest
+from textual.widgets import Input, RichLog
 
 from data_structures.stack_demo_tui import (
     FLOAT32_MAX,
@@ -416,6 +418,19 @@ def test_redo_reapplies_undone_snapshot():
 
     assert app.demo.stack == [1, 2, 3]
     assert app._can_undo()
+
+
+def test_stack_tui_logs_timing_after_submitted_command():
+    async def scenario():
+        app = StackDemoTUI(max_size=5)
+        async with app.run_test() as pilot:
+            input_widget = app.query_one(Input)
+            input_widget.post_message(Input.Submitted(input_widget, "/push 5"))
+            await pilot.pause()
+            log = app.query_one(RichLog)
+            assert log.lines[-1].text.startswith("time: ")
+
+    asyncio.run(scenario())
 
 
 def test_record_undo_state_clears_redo_history():

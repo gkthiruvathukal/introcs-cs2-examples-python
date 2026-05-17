@@ -1,3 +1,7 @@
+import asyncio
+
+from textual.widgets import Input, RichLog
+
 from data_structures.queue_demo_tui import QueueDemoTUI
 
 
@@ -23,3 +27,16 @@ def test_queue_tui_placeholder_mentions_swap_and_rotate():
     placeholder = app.placeholder_text()
     assert "/swap" in placeholder
     assert "/rotate" in placeholder
+
+
+def test_queue_tui_logs_timing_after_submitted_command():
+    async def scenario():
+        app = QueueDemoTUI(max_size=5)
+        async with app.run_test() as pilot:
+            input_widget = app.query_one(Input)
+            input_widget.post_message(Input.Submitted(input_widget, "/enqueue 5"))
+            await pilot.pause()
+            log = app.query_one(RichLog)
+            assert log.lines[-1].text.startswith("time: ")
+
+    asyncio.run(scenario())

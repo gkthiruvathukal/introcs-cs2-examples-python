@@ -2,6 +2,7 @@ import argparse
 import json
 import random
 import shlex
+import time
 from pathlib import Path
 
 from textual import on
@@ -86,6 +87,16 @@ def format_display_value(value) -> str:
     if len(rendered) > DISPLAY_VALUE_LIMIT:
         return rendered[:DISPLAY_VALUE_LIMIT] + "..."
     return rendered
+
+
+def format_elapsed_ns(elapsed_ns: int) -> str:
+    if elapsed_ns < 1_000:
+        return f"{elapsed_ns} ns"
+    if elapsed_ns < 1_000_000:
+        return f"{elapsed_ns / 1_000:.1f} us"
+    if elapsed_ns < 1_000_000_000:
+        return f"{elapsed_ns / 1_000_000:.1f} ms"
+    return f"{elapsed_ns / 1_000_000_000:.3f} s"
 
 
 def save_session(path: Path, payload: dict) -> None:
@@ -349,8 +360,11 @@ class BaseLinearStructureTUI(App):
         raw = event.value.strip()
         self.query_one(Input).clear()
         if raw:
+            started = time.perf_counter_ns()
             self._dispatch(raw)
             self._refresh_panel()
+            elapsed_ns = time.perf_counter_ns() - started
+            self.query_one(RichLog).write(f"[dim]time: {format_elapsed_ns(elapsed_ns)}[/dim]")
 
     def action_scroll_up(self) -> None:
         self._scroll_by(1)

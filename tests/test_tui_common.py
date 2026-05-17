@@ -7,6 +7,7 @@ from data_structures.tui_common import (
     build_random_values,
     clamp_scroll_offset,
     default_position_label,
+    format_elapsed_ns,
     load_session,
     parse_bool,
     parse_single_path,
@@ -80,3 +81,10 @@ def test_build_random_values_for_bool_and_any():
     mixed = build_random_values(10, None, WORDS, rng, -1, 1, -1.0, 1.0)
     assert any(isinstance(value, str) for value in mixed)
     assert any(isinstance(value, bool) for value in mixed)
+
+
+def test_format_elapsed_ns_scales_units():
+    assert format_elapsed_ns(999) == "999 ns"
+    assert format_elapsed_ns(1_500) == "1.5 us"
+    assert format_elapsed_ns(2_500_000) == "2.5 ms"
+    assert format_elapsed_ns(1_250_000_000) == "1.250 s"
