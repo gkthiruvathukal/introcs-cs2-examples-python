@@ -5,7 +5,7 @@ PYTEST  = .venv/bin/pytest
 RUN_ALIASES  = run-bst run-deque run-dict run-dll run-graph run-heap \
                run-list run-networkx run-queue run-set run-sll run-stack run-stack-tui run-trie
 TEST_ALIASES = test-bst test-deque test-dict test-dll test-graph test-heap \
-               test-list test-networkx test-queue test-set test-sll test-stack test-trie
+               test-list test-networkx test-queue test-set test-sll test-stack test-stack-tui test-trie
 
 .PHONY: install test $(RUN_ALIASES) $(TEST_ALIASES)
 
@@ -49,6 +49,7 @@ test-queue:   test-queue_demo
 test-set:     test-set_demo
 test-sll:     test-singly_linked_list
 test-stack:   test-stack_demo
+test-stack-tui: test-stack_demo_tui
 test-trie:    test-trie_demo
 
 # Run a single demo module:  make run-<name>
