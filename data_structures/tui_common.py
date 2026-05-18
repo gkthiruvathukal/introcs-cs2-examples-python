@@ -326,6 +326,8 @@ class BaseLinearStructureTUI(App):
         int_max: int = INT32_MAX,
         float_min: float = FLOAT32_MIN,
         float_max: float = FLOAT32_MAX,
+        capture_dir: Path | None = None,
+        video_dir: Path | None = None,
     ):
         super().__init__()
         self.max_size = max_size
@@ -335,6 +337,8 @@ class BaseLinearStructureTUI(App):
         self.int_max = int_max
         self.float_min = float_min
         self.float_max = float_max
+        self.capture_dir = capture_dir if capture_dir is not None else Path.cwd() / ".capture"
+        self.video_dir = video_dir if video_dir is not None else Path.cwd() / ".video"
         self.random = random.Random()
         self.words = load_words()
         self.undo_history = []
@@ -700,5 +704,19 @@ def build_linear_parser(description: str) -> argparse.ArgumentParser:
         default=FLOAT32_MAX,
         metavar="X",
         help=f"Maximum random float for /random under float or any (default: {FLOAT32_MAX})",
+    )
+    parser.add_argument(
+        "--capture-dir",
+        type=Path,
+        default=Path.cwd() / ".capture",
+        metavar="PATH",
+        help="Directory for captured frame sessions (default: ./.capture)",
+    )
+    parser.add_argument(
+        "--video-dir",
+        type=Path,
+        default=Path.cwd() / ".video",
+        metavar="PATH",
+        help="Directory for rendered videos (default: ./.video)",
     )
     return parser

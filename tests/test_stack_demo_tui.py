@@ -5,6 +5,8 @@ from pathlib import Path
 import pytest
 from textual.widgets import Input, RichLog
 
+from data_structures import capture_utils
+from data_structures import stack_demo_tui as stack_tui_module
 from data_structures.stack_demo_tui import (
     FLOAT32_MAX,
     FLOAT32_MIN,
@@ -429,6 +431,98 @@ def test_stack_tui_logs_timing_after_submitted_command():
             await pilot.pause()
             log = app.query_one(RichLog)
             assert log.lines[-1].text.startswith("time: ")
+
+    asyncio.run(scenario())
+
+
+def test_stack_tui_capture_uses_command_as_default_caption(tmp_path, monkeypatch):
+    capture_dir = tmp_path / ".capture"
+    video_dir = tmp_path / ".video"
+
+    async def scenario():
+        app = StackDemoTUI(max_size=5, capture_dir=capture_dir, video_dir=video_dir)
+
+        def fake_render(text_path, png_path):
+            text_path.write_text("frame text", encoding="utf-8")
+            png_path.write_text("fake png", encoding="utf-8")
+
+        monkeypatch.setattr(stack_tui_module, "render_text_frame_image", fake_render)
+
+        async with app.run_test() as pilot:
+            input_widget = app.query_one(Input)
+            input_widget.post_message(Input.Submitted(input_widget, "/session demo"))
+            await pilot.pause()
+            input_widget.post_message(Input.Submitted(input_widget, "/capture on"))
+            await pilot.pause()
+            input_widget.post_message(Input.Submitted(input_widget, "/push 5"))
+            await pilot.pause()
+
+        payload = capture_utils.load_capture_metadata("stack", "demo", capture_dir)
+        assert len(payload["frames"]) == 1
+        assert payload["frames"][0]["command"] == "/push 5"
+        assert payload["frames"][0]["caption"] == "/push 5"
+
+    asyncio.run(scenario())
+
+
+def test_stack_tui_defaults_session_name_for_capture(tmp_path, monkeypatch):
+    capture_dir = tmp_path / ".capture"
+    video_dir = tmp_path / ".video"
+
+    async def scenario():
+        app = StackDemoTUI(max_size=5, capture_dir=capture_dir, video_dir=video_dir)
+
+        def fake_render(text_path, png_path):
+            text_path.write_text("frame text", encoding="utf-8")
+            png_path.write_text("fake png", encoding="utf-8")
+
+        monkeypatch.setattr(stack_tui_module, "render_text_frame_image", fake_render)
+
+        async with app.run_test() as pilot:
+            input_widget = app.query_one(Input)
+            input_widget.post_message(Input.Submitted(input_widget, "/capture on"))
+            await pilot.pause()
+            input_widget.post_message(Input.Submitted(input_widget, "/push 5"))
+            await pilot.pause()
+
+        payload = capture_utils.load_capture_metadata("stack", "session-stack-demo", capture_dir)
+        assert len(payload["frames"]) == 1
+
+    asyncio.run(scenario())
+
+
+def test_stack_tui_video_uses_active_session_by_default(tmp_path, monkeypatch):
+    capture_dir = tmp_path / ".capture"
+    video_dir = tmp_path / ".video"
+
+    async def scenario():
+        app = StackDemoTUI(max_size=5, capture_dir=capture_dir, video_dir=video_dir)
+
+        def fake_render(text_path, png_path):
+            text_path.write_text("frame text", encoding="utf-8")
+            png_path.write_text("fake png", encoding="utf-8")
+
+        def fake_video(structure_slug, session_name, seconds_per_frame=5.0, **kwargs):
+            output = video_dir / structure_slug / f"{session_name}.mp4"
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_text("fake video", encoding="utf-8")
+            return output
+
+        monkeypatch.setattr(stack_tui_module, "render_text_frame_image", fake_render)
+        monkeypatch.setattr(stack_tui_module, "render_capture_video", fake_video)
+
+        async with app.run_test() as pilot:
+            input_widget = app.query_one(Input)
+            input_widget.post_message(Input.Submitted(input_widget, "/session demo"))
+            await pilot.pause()
+            input_widget.post_message(Input.Submitted(input_widget, "/capture on"))
+            await pilot.pause()
+            input_widget.post_message(Input.Submitted(input_widget, "/push 5"))
+            await pilot.pause()
+            input_widget.post_message(Input.Submitted(input_widget, "/video"))
+            await pilot.pause()
+
+        assert (video_dir / "stack" / "demo.mp4").exists()
 
     asyncio.run(scenario())
 

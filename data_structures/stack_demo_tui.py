@@ -9,6 +9,17 @@ from textual import on
 from textual.app import App, ComposeResult
 from textual.widgets import Footer, Header, Input, RichLog, Static
 
+from data_structures.capture_utils import (
+    default_session_name,
+    ensure_capture_session,
+    next_frame_paths,
+    parse_capture_mode,
+    parse_session_arg,
+    parse_video_args,
+    render_capture_video,
+    append_capture_frame,
+    render_text_frame_image,
+)
 from data_structures.tui_common import format_elapsed_ns
 
 INT32_MIN = -(2 ** 31)
@@ -410,6 +421,8 @@ class StackDemoTUI(App):
         int_max: int = INT32_MAX,
         float_min: float = FLOAT32_MIN,
         float_max: float = FLOAT32_MAX,
+        capture_dir: Path | None = None,
+        video_dir: Path | None = None,
     ):
         super().__init__()
         self.demo = StackDemo(max_size=max_size)
@@ -419,17 +432,21 @@ class StackDemoTUI(App):
         self.int_max = int_max
         self.float_min = float_min
         self.float_max = float_max
+        self.capture_dir = capture_dir if capture_dir is not None else Path.cwd() / ".capture"
+        self.video_dir = video_dir if video_dir is not None else Path.cwd() / ".video"
         self.random = random.Random()
         self.words = load_words()
         self.undo_history = []
         self.redo_history = []
+        self.capture_session_name = default_session_name("stack-demo")
+        self.capture_enabled = False
 
     def compose(self) -> ComposeResult:
         yield Header()
         yield StackPanel(id="panel")
         yield RichLog(id="log", highlight=True, markup=True)
         yield Input(
-            placeholder="/help  /push <v...>  /random <n>  /pop  /peek  /at <index>  /dup  /swap  /rotate  /clear  /save <file>  /load <file>  /undo  /redo  /type [int|float|str|bool|any]  /quit"
+            placeholder="/help  /push <v...>  /random <n>  /pop  /peek  /at <index>  /dup  /swap  /rotate  /clear  /session <name>  /capture [on|off]  /video [session] [seconds]  /save <file>  /load <file>  /undo  /redo  /type [int|float|str|bool|any]  /quit"
         )
         yield Footer()
 
@@ -444,11 +461,15 @@ class StackDemoTUI(App):
         raw = event.value.strip()
         self.query_one(Input).clear()
         if raw:
+            verb = raw.split(maxsplit=1)[0].lower()
             started = time.perf_counter_ns()
             self._dispatch(raw)
             self._refresh_panel()
             elapsed_ns = time.perf_counter_ns() - started
-            self.query_one(RichLog).write(f"[dim]time: {format_elapsed_ns(elapsed_ns)}[/dim]")
+            log = self.query_one(RichLog)
+            log.write(f"[dim]time: {format_elapsed_ns(elapsed_ns)}[/dim]")
+            if verb not in ("/capture", "/session", "/quit", "/exit"):
+                self._maybe_capture_frame(raw, elapsed_ns, log)
 
     def action_scroll_up(self) -> None:
         self._scroll_by(1)
@@ -590,6 +611,54 @@ class StackDemoTUI(App):
             self.demo.clear()
             self.scroll_offset = 0
             log.write(f"[green]clear() removed {previous_size} values  size={self.demo.size()}[/green]")
+
+        elif verb == "/session":
+            try:
+                session_name = parse_session_arg(arg)
+                self.capture_session_name = session_name
+                ensure_capture_session("stack", session_name, self.capture_dir)
+                log.write(f"[green]session({session_name!r}) selected for future captures[/green]")
+            except ValueError as e:
+                log.write(f"[red]{e}[/red]")
+
+        elif verb == "/capture":
+            try:
+                mode = parse_capture_mode(arg)
+                if mode == "on":
+                    ensure_capture_session("stack", self.capture_session_name, self.capture_dir)
+                    self.capture_enabled = True
+                    log.write(
+                        f"[green]capture(on)[/green] "
+                        f"[dim]session={self.capture_session_name!r}[/dim]"
+                    )
+                else:
+                    self.capture_enabled = False
+                    log.write(
+                        f"[green]capture(off)[/green] "
+                        f"[dim]session remains {self.capture_session_name!r}[/dim]"
+                    )
+            except ValueError as e:
+                log.write(f"[red]{e}[/red]")
+
+        elif verb == "/video":
+            try:
+                session_name, seconds_per_frame = parse_video_args(arg)
+                session_name = session_name or self.capture_session_name
+                output_path = render_capture_video(
+                    "stack",
+                    session_name,
+                    seconds_per_frame,
+                    capture_dir=self.capture_dir,
+                    video_dir=self.video_dir,
+                )
+                log.write(
+                    f"[green]video({session_name!r}) wrote {str(output_path)!r}[/green] "
+                    f"[dim]captions default to commands; {seconds_per_frame:g}s per frame[/dim]"
+                )
+            except (ValueError, OSError, RuntimeError) as e:
+                log.write(f"[red]Video failed: {e}[/red]")
+            except Exception as e:
+                log.write(f"[red]Video failed: {e}[/red]")
 
         elif verb == "/swap":
             try:
@@ -747,6 +816,9 @@ class StackDemoTUI(App):
                 "  [cyan]/swap[/cyan]                       swap the top two values\n"
                 "  [cyan]/rotate[/cyan]                     rotate the top three values\n"
                 "  [cyan]/clear[/cyan]                      remove all values from the stack\n"
+                "  [cyan]/session <name>[/cyan]              set the session name for future captured frames\n"
+                "  [cyan]/capture [on|off][/cyan]            enable or suspend frame capture for the active session\n"
+                "  [cyan]/video [session] [seconds][/cyan]  build an mp4 from captured frames; defaults to current session and 5s\n"
                 "  [cyan]/save <path>[/cyan]                save the current type and stack contents\n"
                 "  [cyan]/load <path>[/cyan]                load a saved session into a fresh stack\n"
                 "  [cyan]/undo[/cyan]                       restore the previous stack/type state\n"
@@ -794,6 +866,41 @@ class StackDemoTUI(App):
             scroll_offset=self.scroll_offset,
         )
 
+    def _maybe_capture_frame(self, raw: str, elapsed_ns: int, log: RichLog) -> None:
+        if not self.capture_enabled or not self.capture_session_name:
+            return
+        try:
+            text_path, png_path, _ = next_frame_paths("stack", self.capture_session_name, self.capture_dir)
+            text_path.write_text(self._capture_frame_text(), encoding="utf-8")
+            render_text_frame_image(text_path, png_path)
+            append_capture_frame(
+                "stack",
+                self.capture_session_name,
+                command=raw,
+                elapsed_ns=elapsed_ns,
+                screenshot_path=text_path,
+                capture_dir=self.capture_dir,
+            )
+            log.write(
+                f"[dim]captured frame for session {self.capture_session_name!r}: {png_path.name}[/dim]"
+            )
+        except Exception as e:
+            log.write(f"[red]Capture failed: {e}[/red]")
+
+    def _capture_frame_text(self) -> str:
+        panel = self.query_one(StackPanel)
+        log = self.query_one(RichLog)
+        recent_lines = [line.text for line in log.lines[-8:]]
+        sections = [
+            "STACK TUI CAPTURE",
+            "",
+            panel.content,
+            "",
+            "Recent log:",
+            *recent_lines,
+        ]
+        return "\n".join(sections)
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Interactive Stack Demo")
@@ -836,6 +943,20 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="X",
         help=f"Maximum random float for /random under float or any (default: {FLOAT32_MAX})",
     )
+    parser.add_argument(
+        "--capture-dir",
+        type=Path,
+        default=Path.cwd() / ".capture",
+        metavar="PATH",
+        help="Directory for captured frame sessions (default: ./.capture)",
+    )
+    parser.add_argument(
+        "--video-dir",
+        type=Path,
+        default=Path.cwd() / ".video",
+        metavar="PATH",
+        help="Directory for rendered videos (default: ./.video)",
+    )
     return parser
 
 
@@ -853,6 +974,8 @@ def main() -> None:
         int_max=args.int_max,
         float_min=args.float_min,
         float_max=args.float_max,
+        capture_dir=args.capture_dir,
+        video_dir=args.video_dir,
     ).run()
 
 

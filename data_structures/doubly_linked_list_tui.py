@@ -487,6 +487,8 @@ def main() -> None:
         int_max=args.int_max,
         float_min=args.float_min,
         float_max=args.float_max,
+        capture_dir=args.capture_dir,
+        video_dir=args.video_dir,
     ).run()
 
 
