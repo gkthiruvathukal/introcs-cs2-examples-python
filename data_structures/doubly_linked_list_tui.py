@@ -289,6 +289,7 @@ class DoublyLinkedListTUI(BaseLinearStructureTUI):
     """
 
     STRUCTURE_NAME = "Doubly Linked List"
+    STRUCTURE_SLUG = "dll"
     START_LABEL = "head"
     END_LABEL = "tail"
 

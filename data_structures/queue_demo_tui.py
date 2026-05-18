@@ -12,6 +12,7 @@ from data_structures.tui_common import (
 
 class QueueDemoTUI(BaseLinearStructureTUI):
     STRUCTURE_NAME = "Queue"
+    STRUCTURE_SLUG = "queue"
     START_LABEL = "front"
     END_LABEL = "back"
 

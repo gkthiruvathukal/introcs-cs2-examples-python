@@ -7,6 +7,7 @@ from textual.widgets import Input, RichLog
 
 from data_structures import capture_utils
 from data_structures import stack_demo_tui as stack_tui_module
+import data_structures.tui_common as tui_common_module
 from data_structures.stack_demo_tui import (
     FLOAT32_MAX,
     FLOAT32_MIN,
@@ -108,15 +109,15 @@ def test_offset_labels_show_top_bottom_and_top_equals_bottom():
 
 
 def test_clamp_scroll_offset_clamps_to_valid_bounds():
-    assert clamp_scroll_offset(stack_size=5, view_top=3, scroll_offset=-2) == 0
-    assert clamp_scroll_offset(stack_size=5, view_top=3, scroll_offset=10) == 2
-    assert clamp_scroll_offset(stack_size=5, view_top=1, scroll_offset=10) == 0
+    assert clamp_scroll_offset(5, 3, -2) == 0
+    assert clamp_scroll_offset(5, 3, 10) == 2
+    assert clamp_scroll_offset(5, 1, 10) == 0
 
 
 def test_clamp_scroll_offset_returns_zero_when_scrolling_is_not_needed():
-    assert clamp_scroll_offset(stack_size=3, view_top=3, scroll_offset=1) == 0
-    assert clamp_scroll_offset(stack_size=5, view_top=1, scroll_offset=1) == 0
-    assert clamp_scroll_offset(stack_size=5, view_top=None, scroll_offset=1) == 0
+    assert clamp_scroll_offset(3, 3, 1) == 0
+    assert clamp_scroll_offset(5, 1, 1) == 0
+    assert clamp_scroll_offset(5, None, 1) == 0
 
 
 def test_parse_push_values_supports_multiple_tokens_and_quotes():
@@ -446,7 +447,7 @@ def test_stack_tui_capture_uses_command_as_default_caption(tmp_path, monkeypatch
             text_path.write_text("frame text", encoding="utf-8")
             png_path.write_text("fake png", encoding="utf-8")
 
-        monkeypatch.setattr(stack_tui_module, "render_text_frame_image", fake_render)
+        monkeypatch.setattr(tui_common_module, "render_text_frame_image", fake_render)
 
         async with app.run_test() as pilot:
             input_widget = app.query_one(Input)
@@ -476,7 +477,7 @@ def test_stack_tui_defaults_session_name_for_capture(tmp_path, monkeypatch):
             text_path.write_text("frame text", encoding="utf-8")
             png_path.write_text("fake png", encoding="utf-8")
 
-        monkeypatch.setattr(stack_tui_module, "render_text_frame_image", fake_render)
+        monkeypatch.setattr(tui_common_module, "render_text_frame_image", fake_render)
 
         async with app.run_test() as pilot:
             input_widget = app.query_one(Input)
@@ -485,7 +486,7 @@ def test_stack_tui_defaults_session_name_for_capture(tmp_path, monkeypatch):
             input_widget.post_message(Input.Submitted(input_widget, "/push 5"))
             await pilot.pause()
 
-        payload = capture_utils.load_capture_metadata("stack", "session-stack-demo", capture_dir)
+        payload = capture_utils.load_capture_metadata("stack", "session-stack", capture_dir)
         assert len(payload["frames"]) == 1
 
     asyncio.run(scenario())
@@ -508,8 +509,8 @@ def test_stack_tui_video_uses_active_session_by_default(tmp_path, monkeypatch):
             output.write_text("fake video", encoding="utf-8")
             return output
 
-        monkeypatch.setattr(stack_tui_module, "render_text_frame_image", fake_render)
-        monkeypatch.setattr(stack_tui_module, "render_capture_video", fake_video)
+        monkeypatch.setattr(tui_common_module, "render_text_frame_image", fake_render)
+        monkeypatch.setattr(tui_common_module, "render_capture_video", fake_video)
 
         async with app.run_test() as pilot:
             input_widget = app.query_one(Input)

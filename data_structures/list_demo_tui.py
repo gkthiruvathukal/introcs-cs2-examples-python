@@ -14,6 +14,7 @@ from data_structures.tui_common import (
 
 class ListDemoTUI(BaseLinearStructureTUI):
     STRUCTURE_NAME = "List"
+    STRUCTURE_SLUG = "list"
     START_LABEL = "first"
     END_LABEL = "last"
 

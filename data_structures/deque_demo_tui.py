@@ -98,6 +98,7 @@ class DequePanel(LinearPanel):
 
 class DequeDemoTUI(BaseLinearStructureTUI):
     STRUCTURE_NAME = "Deque"
+    STRUCTURE_SLUG = "deque"
     START_LABEL = "front"
     END_LABEL = "back"
 
@@ -138,7 +139,7 @@ class DequeDemoTUI(BaseLinearStructureTUI):
         return f"front → back: {self.get_items()!r}"
 
     def placeholder_text(self) -> str:
-        return "/help  /push-front <v...>  /push-back <v...>  /random <n>  /pop-front  /pop-back  /peek-front  /peek-back  /at <index>  /clear  /save <file>  /load <file>  /undo  /redo  /type [int|float|str|bool|any]  /quit"
+        return "/help  /push-front <v...>  /push-back <v...>  /random <n>  /pop-front  /pop-back  /peek-front  /peek-back  /at <index>  /clear  /session <name>  /capture [on|off]  /video [session] [seconds]  /save <file>  /load <file>  /undo  /redo  /type [int|float|str|bool|any]  /quit"
 
     def help_lines(self) -> list[str]:
         return [

@@ -1,4 +1,5 @@
 from data_structures.deque_demo_tui import DequeDemoTUI, DequePanel
+from data_structures.capture_utils import default_session_name
 
 
 def test_deque_tui_prepend_and_append_preserve_ends():
@@ -23,3 +24,13 @@ def test_deque_panel_labels_show_displacement_from_both_ends():
     assert DequePanel._format_back_label(0, 4) == "front"
     assert DequePanel._format_back_label(1, 4) == "back+2"
     assert DequePanel._format_back_label(3, 4) == "back"
+
+
+def test_deque_tui_structure_slug_is_deque():
+    assert DequeDemoTUI.STRUCTURE_SLUG == "deque"
+
+
+def test_deque_tui_capture_initially_disabled():
+    app = DequeDemoTUI()
+    assert not app.capture_enabled
+    assert app.capture_session_name == default_session_name("deque")

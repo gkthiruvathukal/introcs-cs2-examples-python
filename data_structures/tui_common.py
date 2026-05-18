@@ -9,6 +9,18 @@ from textual import on
 from textual.app import App, ComposeResult
 from textual.widgets import Footer, Header, Input, RichLog, Static
 
+from data_structures.capture_utils import (
+    append_capture_frame,
+    default_session_name,
+    ensure_capture_session,
+    next_frame_paths,
+    parse_capture_mode,
+    parse_session_arg,
+    parse_video_args,
+    render_capture_video,
+    render_text_frame_image,
+)
+
 INT32_MIN = -(2 ** 31)
 INT32_MAX = 2 ** 31 - 1
 FLOAT32_MIN = -3.4028235e38
@@ -311,6 +323,7 @@ class BaseLinearStructureTUI(App):
     ]
 
     STRUCTURE_NAME = "Structure"
+    STRUCTURE_SLUG = "structure"
     START_LABEL = "start"
     END_LABEL = "end"
     DEFAULT_TYPE = "int"
@@ -345,6 +358,8 @@ class BaseLinearStructureTUI(App):
         self.redo_history = []
         self.element_type = None
         self.set_type(self.DEFAULT_TYPE)
+        self.capture_session_name = default_session_name(self.STRUCTURE_SLUG)
+        self.capture_enabled = False
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -364,11 +379,15 @@ class BaseLinearStructureTUI(App):
         raw = event.value.strip()
         self.query_one(Input).clear()
         if raw:
+            verb = raw.split(maxsplit=1)[0].lower()
             started = time.perf_counter_ns()
             self._dispatch(raw)
             self._refresh_panel()
             elapsed_ns = time.perf_counter_ns() - started
-            self.query_one(RichLog).write(f"[dim]time: {format_elapsed_ns(elapsed_ns)}[/dim]")
+            log = self.query_one(RichLog)
+            log.write(f"[dim]time: {format_elapsed_ns(elapsed_ns)}[/dim]")
+            if verb not in ("/capture", "/session", "/quit", "/exit"):
+                self._maybe_capture_frame(raw, elapsed_ns, log)
 
     def action_scroll_up(self) -> None:
         self._scroll_by(1)
@@ -452,18 +471,24 @@ class BaseLinearStructureTUI(App):
         self.replace_items(snapshot["items"])
         self.scroll_offset = 0
 
+    def _can_undo(self) -> bool:
+        return len(self.undo_history) > 0
+
+    def _can_redo(self) -> bool:
+        return len(self.redo_history) > 0
+
     def _record_undo_state(self) -> None:
         self.undo_history.append(self._snapshot_state())
         self.redo_history.clear()
 
     def _undo(self) -> None:
-        if not self.undo_history:
+        if not self._can_undo():
             raise ValueError("Nothing to undo")
         self.redo_history.append(self._snapshot_state())
         self._restore_snapshot(self.undo_history.pop())
 
     def _redo(self) -> None:
-        if not self.redo_history:
+        if not self._can_redo():
             raise ValueError("Nothing to redo")
         self.undo_history.append(self._snapshot_state())
         self._restore_snapshot(self.redo_history.pop())
@@ -634,6 +659,54 @@ class BaseLinearStructureTUI(App):
         elif verb in ("/quit", "/exit"):
             self.exit()
 
+        elif verb == "/session":
+            try:
+                session_name = parse_session_arg(arg)
+                self.capture_session_name = session_name
+                ensure_capture_session(self.STRUCTURE_SLUG, session_name, self.capture_dir)
+                log.write(f"[green]session({session_name!r}) selected for future captures[/green]")
+            except ValueError as e:
+                log.write(f"[red]{e}[/red]")
+
+        elif verb == "/capture":
+            try:
+                mode = parse_capture_mode(arg)
+                if mode == "on":
+                    ensure_capture_session(self.STRUCTURE_SLUG, self.capture_session_name, self.capture_dir)
+                    self.capture_enabled = True
+                    log.write(
+                        f"[green]capture(on)[/green] "
+                        f"[dim]session={self.capture_session_name!r}[/dim]"
+                    )
+                else:
+                    self.capture_enabled = False
+                    log.write(
+                        f"[green]capture(off)[/green] "
+                        f"[dim]session remains {self.capture_session_name!r}[/dim]"
+                    )
+            except ValueError as e:
+                log.write(f"[red]{e}[/red]")
+
+        elif verb == "/video":
+            try:
+                session_name, seconds_per_frame = parse_video_args(arg)
+                session_name = session_name or self.capture_session_name
+                output_path = render_capture_video(
+                    self.STRUCTURE_SLUG,
+                    session_name,
+                    seconds_per_frame,
+                    capture_dir=self.capture_dir,
+                    video_dir=self.video_dir,
+                )
+                log.write(
+                    f"[green]video({session_name!r}) wrote {str(output_path)!r}[/green] "
+                    f"[dim]captions default to commands; {seconds_per_frame:g}s per frame[/dim]"
+                )
+            except (ValueError, OSError, RuntimeError) as e:
+                log.write(f"[red]Video failed: {e}[/red]")
+            except Exception as e:
+                log.write(f"[red]Video failed: {e}[/red]")
+
         elif verb == "/help":
             lines = [
                 "[bold]Commands[/bold]",
@@ -644,6 +717,9 @@ class BaseLinearStructureTUI(App):
             lines.extend(
                 [
                     "  [cyan]/clear[/cyan]                      remove all values",
+                    "  [cyan]/session <name>[/cyan]              set the session name for future captured frames",
+                    "  [cyan]/capture [on|off][/cyan]            enable or suspend frame capture for the active session",
+                    "  [cyan]/video [session] [seconds][/cyan]  build an mp4 from captured frames; defaults to current session and 5s",
                     "  [cyan]/save <path>[/cyan]                save the current type and contents",
                     "  [cyan]/load <path>[/cyan]                load a saved session into a fresh structure",
                     "  [cyan]/undo[/cyan]                       restore the previous state",
@@ -662,6 +738,42 @@ class BaseLinearStructureTUI(App):
 
         else:
             log.write(f"[red]Unknown command: {verb!r} — type /help[/red]")
+
+
+    def _maybe_capture_frame(self, raw: str, elapsed_ns: int, log: RichLog) -> None:
+        if not self.capture_enabled or not self.capture_session_name:
+            return
+        try:
+            text_path, png_path, _ = next_frame_paths(self.STRUCTURE_SLUG, self.capture_session_name, self.capture_dir)
+            text_path.write_text(self._capture_frame_text(), encoding="utf-8")
+            render_text_frame_image(text_path, png_path)
+            append_capture_frame(
+                self.STRUCTURE_SLUG,
+                self.capture_session_name,
+                command=raw,
+                elapsed_ns=elapsed_ns,
+                screenshot_path=text_path,
+                capture_dir=self.capture_dir,
+            )
+            log.write(
+                f"[dim]captured frame for session {self.capture_session_name!r}: {png_path.name}[/dim]"
+            )
+        except Exception as e:
+            log.write(f"[red]Capture failed: {e}[/red]")
+
+    def _capture_frame_text(self) -> str:
+        panel = self.query_one("#panel")
+        log = self.query_one(RichLog)
+        recent_lines = [line.text for line in log.lines[-8:]]
+        sections = [
+            f"{self.STRUCTURE_NAME} TUI CAPTURE",
+            "",
+            str(panel.content),
+            "",
+            "Recent log:",
+            *recent_lines,
+        ]
+        return "\n".join(sections)
 
 
 def build_linear_parser(description: str) -> argparse.ArgumentParser:

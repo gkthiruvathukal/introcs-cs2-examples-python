@@ -276,6 +276,7 @@ class SinglyLinkedListTUI(BaseLinearStructureTUI):
     """
 
     STRUCTURE_NAME = "Singly Linked List"
+    STRUCTURE_SLUG = "sll"
     START_LABEL = "head"
     END_LABEL = "tail"
 
