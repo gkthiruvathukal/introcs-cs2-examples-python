@@ -2,7 +2,7 @@ import random
 
 import pytest
 
-from data_structures.tui_common import (
+from data_structures.tui.tui_common import (
     build_linear_view,
     build_random_values,
     clamp_scroll_offset,

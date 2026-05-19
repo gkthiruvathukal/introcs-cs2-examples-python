@@ -2,7 +2,7 @@ import asyncio
 
 from textual.widgets import Input, RichLog
 
-from data_structures.deque_demo_tui import DequeDemoTUI, DequePanel
+from data_structures.tui.deque_demo_tui import DequeDemoTUI, DequePanel
 
 
 def test_deque_tui_prepend_and_append_preserve_ends():

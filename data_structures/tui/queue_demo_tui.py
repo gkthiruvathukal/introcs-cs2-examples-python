@@ -1,7 +1,7 @@
 from textual.widgets import RichLog
 
 from data_structures.queue_demo import QueueDemo
-from data_structures.tui_common import (
+from .tui_common import (
     BaseLinearStructureTUI,
     build_linear_parser,
     format_value_batch,

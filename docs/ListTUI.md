@@ -1,6 +1,6 @@
 # List TUI
 
-`data_structures/list_demo_tui.py` is an interactive Textual demo for indexed list operations.
+`data_structures/tui/list_demo_tui.py` is an interactive Textual demo for indexed list operations.
 
 Run it with:
 
@@ -11,7 +11,7 @@ make run-list-tui
 or:
 
 ```bash
-.venv/bin/python -m data_structures.list_demo_tui
+.venv/bin/python -m data_structures.tui.list_demo_tui
 ```
 
 Key behavior:

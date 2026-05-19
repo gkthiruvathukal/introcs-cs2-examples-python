@@ -5,8 +5,8 @@ from pathlib import Path
 import pytest
 from textual.widgets import Input, RichLog
 
-from data_structures import stack_demo_tui as stack_tui_module
-from data_structures.stack_demo_tui import (
+from data_structures.tui import stack_demo_tui as stack_tui_module
+from data_structures.tui.stack_demo_tui import (
     FLOAT32_MAX,
     FLOAT32_MIN,
     INT32_MAX,

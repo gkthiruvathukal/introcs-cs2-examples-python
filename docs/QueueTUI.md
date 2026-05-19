@@ -1,6 +1,6 @@
 # Queue TUI
 
-`data_structures/queue_demo_tui.py` is an interactive Textual demo for queue behavior.
+`data_structures/tui/queue_demo_tui.py` is an interactive Textual demo for queue behavior.
 
 Run it with:
 
@@ -11,7 +11,7 @@ make run-queue-tui
 or:
 
 ```bash
-.venv/bin/python -m data_structures.queue_demo_tui
+.venv/bin/python -m data_structures.tui.queue_demo_tui
 ```
 
 Key behavior:

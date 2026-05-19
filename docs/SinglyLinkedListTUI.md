@@ -1,6 +1,6 @@
 # Singly Linked List TUI
 
-`data_structures/singly_linked_list_tui.py` is an interactive Textual demo for head-to-tail linked-list behavior.
+`data_structures/tui/singly_linked_list_tui.py` is an interactive Textual demo for head-to-tail linked-list behavior.
 
 Run it with:
 
@@ -11,7 +11,7 @@ make run-sll-tui
 or:
 
 ```bash
-.venv/bin/python -m data_structures.singly_linked_list_tui
+.venv/bin/python -m data_structures.tui.singly_linked_list_tui
 ```
 
 Key behavior:

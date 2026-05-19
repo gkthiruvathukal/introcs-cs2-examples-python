@@ -3,13 +3,13 @@ PYTEST  = .venv/bin/pytest
 
 # Convenience short aliases
 RUN_ALIASES  = run-bst run-deque run-dict run-dll run-graph run-heap \
-               run-list run-networkx run-queue run-set run-sll run-stack run-stack-tui \
-               run-queue-tui run-deque-tui run-list-tui run-sll-tui run-dll-tui run-trie
+               run-list run-networkx run-queue run-set run-sll run-stack run-trie
 TEST_ALIASES = test-bst test-deque test-dict test-dll test-graph test-heap \
                test-list test-networkx test-queue test-set test-sll test-stack test-stack-tui \
                test-queue-tui test-deque-tui test-list-tui test-sll-tui test-dll-tui test-trie
 
-.PHONY: install test $(RUN_ALIASES) $(TEST_ALIASES)
+.PHONY: install test $(RUN_ALIASES) $(TEST_ALIASES) \
+        run-stack-tui run-queue-tui run-deque-tui run-list-tui run-sll-tui run-dll-tui
 
 # Create the virtual environment
 .venv:
@@ -23,7 +23,7 @@ install: .venv
 test:
 	$(PYTEST) tests/
 
-# Short aliases
+# Short aliases — non-TUI demos
 run-bst:     run-binary_search_tree_demo
 run-deque:   run-deque_demo
 run-dict:    run-dictionary_demo
@@ -33,17 +33,31 @@ run-heap:    run-heap_demo
 run-list:    run-list_demo
 run-networkx: run-networkx_graph_demo
 run-queue:   run-queue_demo
-run-queue-tui: run-queue_demo_tui
 run-set:     run-set_demo
 run-sll:     run-singly_linked_list
-run-sll-tui: run-singly_linked_list_tui
-run-stack:     run-stack_demo
-run-stack-tui: run-stack_demo_tui
-run-deque-tui: run-deque_demo_tui
-run-list-tui: run-list_demo_tui
-run-dll-tui: run-doubly_linked_list_tui
+run-stack:   run-stack_demo
 run-trie:    run-trie_demo
 
+# TUI run targets (data_structures.tui.*)
+run-stack-tui:
+	$(PYTHON) -m data_structures.tui.stack_demo_tui
+
+run-queue-tui:
+	$(PYTHON) -m data_structures.tui.queue_demo_tui
+
+run-deque-tui:
+	$(PYTHON) -m data_structures.tui.deque_demo_tui
+
+run-list-tui:
+	$(PYTHON) -m data_structures.tui.list_demo_tui
+
+run-sll-tui:
+	$(PYTHON) -m data_structures.tui.singly_linked_list_tui
+
+run-dll-tui:
+	$(PYTHON) -m data_structures.tui.doubly_linked_list_tui
+
+# Test aliases
 test-bst:     test-binary_search_tree_demo
 test-deque:   test-deque_demo
 test-dict:    test-dictionary_demo
@@ -64,7 +78,7 @@ test-list-tui: test-list_demo_tui
 test-dll-tui: test-doubly_linked_list_tui
 test-trie:    test-trie_demo
 
-# Run a single demo module:  make run-<name>
+# Run a single non-TUI demo module:  make run-<name>
 #   Note: demo files contain only class definitions (no __main__),
 #   so these targets verify clean import but produce no output.
 #
@@ -72,16 +86,14 @@ test-trie:    test-trie_demo
 #     binary_search_tree_demo   deque_demo         dictionary_demo
 #     doubly_linked_list        graph_demo         heap_demo
 #     list_demo                 networkx_graph_demo  queue_demo
-#     queue_demo_tui            deque_demo_tui     list_demo_tui
-#     singly_linked_list        singly_linked_list_tui
-#     doubly_linked_list_tui    set_demo           stack_demo
-#     stack_demo_tui            trie_demo
+#     set_demo                  singly_linked_list   stack_demo
+#     trie_demo
 run-%:
 	$(PYTHON) -m data_structures.$*
 
 # Run a single test module:  make test-<name>
 #
-#   Valid names (same list as above):
+#   Valid names (same list as above, plus tui variants):
 #     binary_search_tree_demo   deque_demo         dictionary_demo
 #     doubly_linked_list        graph_demo         heap_demo
 #     list_demo                 networkx_graph_demo  queue_demo

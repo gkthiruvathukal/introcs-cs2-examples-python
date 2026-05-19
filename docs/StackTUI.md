@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`data_structures/stack_demo_tui.py` is an interactive terminal app for experimenting with a stack by pushing, popping, peeking, and viewing the current contents.
+`data_structures/tui/stack_demo_tui.py` is an interactive terminal app for experimenting with a stack by pushing, popping, peeking, and viewing the current contents.
 
 It uses the same core stack operations as the stack demo, but presents them in a Textual-based interface with:
 
@@ -33,7 +33,7 @@ make run-stack-tui
 You can also run the module directly:
 
 ```bash
-.venv/bin/python -m data_structures.stack_demo_tui
+.venv/bin/python -m data_structures.tui.stack_demo_tui
 ```
 
 By default, the app shows up to 8 stack rows at a time.
@@ -48,7 +48,7 @@ Set the maximum number of items allowed in the stack.
 Example:
 
 ```bash
-.venv/bin/python -m data_structures.stack_demo_tui --max-size 20
+.venv/bin/python -m data_structures.tui.stack_demo_tui --max-size 20
 ```
 
 ### `--view-top N`
@@ -64,7 +64,7 @@ If the stack grows beyond `N`, the panel does not keep expanding vertically. Ins
 Example:
 
 ```bash
-.venv/bin/python -m data_structures.stack_demo_tui --view-top 5
+.venv/bin/python -m data_structures.tui.stack_demo_tui --view-top 5
 ```
 
 If you omit `--view-top`, the default is `8`.
@@ -84,7 +84,7 @@ They do not affect `bool` or `str` random generation.
 Example:
 
 ```bash
-.venv/bin/python -m data_structures.stack_demo_tui \
+.venv/bin/python -m data_structures.tui.stack_demo_tui \
   --int-min 0 --int-max 100 \
   --float-min -10.0 --float-max 10.0
 ```
@@ -112,7 +112,7 @@ If a displayed value is longer than 40 characters, the panel truncates it with `
 
 ## How the Code Is Put Together
 
-The implementation lives in [data_structures/stack_demo_tui.py](/Volumes/Work/introcs-cs2-examples-python/data_structures/stack_demo_tui.py:1). The main pieces are:
+The implementation lives in [data_structures/tui/stack_demo_tui.py](/Volumes/Work/introcs-cs2-examples-python/data_structures/tui/stack_demo_tui.py:1). The main pieces are:
 
 - `StackDemo`: the stack model, including push/pop/peek, capacity, and optional type conversion
 - `parse_push_values(...)`, `build_random_values(...)`, `save_session(...)`, `load_session(...)`, `snapshot_stack(...)`, and `restore_stack(...)`: helpers for command parsing, random generation, persistence, and undo/redo

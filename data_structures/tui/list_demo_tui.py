@@ -3,7 +3,7 @@ import argparse
 from textual.widgets import RichLog
 
 from data_structures.list_demo import ListDemo
-from data_structures.tui_common import (
+from .tui_common import (
     BaseLinearStructureTUI,
     build_linear_parser,
     format_value_batch,

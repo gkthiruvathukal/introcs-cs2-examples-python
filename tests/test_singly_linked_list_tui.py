@@ -1,4 +1,4 @@
-from data_structures.singly_linked_list_tui import (
+from data_structures.tui.singly_linked_list_tui import (
     SinglyLinkedListTUI,
     build_horizontal_sll_view,
     build_sll_cards,
