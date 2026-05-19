@@ -28,14 +28,14 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y ffmpeg fonts-liberation fonts-dejavu-mono
 
-      - name: Install vhs
+      - name: Install vhs and ttyd
         run: |
           sudo mkdir -p /etc/apt/keyrings
           curl -fsSL https://repo.charm.sh/apt/gpg.key \
             | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
           echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" \
             | sudo tee /etc/apt/sources.list.d/charm.list
-          sudo apt-get update -q && sudo apt-get install -y vhs
+          sudo apt-get update -q && sudo apt-get install -y vhs ttyd
 
       - name: Generate demo videos
         run: make demo-dll
