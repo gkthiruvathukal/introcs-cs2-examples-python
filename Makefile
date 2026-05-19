@@ -9,7 +9,8 @@ TEST_ALIASES = test-bst test-deque test-dict test-dll test-graph test-heap \
                test-queue-app test-deque-app test-list-app test-sll-app test-dll-app test-trie
 
 .PHONY: install test $(RUN_ALIASES) $(TEST_ALIASES) \
-        run-stack-app run-queue-app run-deque-app run-list-app run-sll-app run-dll-app
+        run-stack-app run-queue-app run-deque-app run-list-app run-sll-app run-dll-app \
+        demo-dll demo-dll-dark demo-dll-light
 
 # Create the virtual environment
 .venv:
@@ -77,6 +78,15 @@ test-deque-app: test-deque_app
 test-list-app: test-list_app
 test-dll-app: test-doubly_linked_list_app
 test-trie:    test-trie_demo
+
+# Demo videos (requires vhs: https://github.com/charmbracelet/vhs)
+demo-dll-dark:
+	vhs demos/dll-dark.tape
+
+demo-dll-light:
+	vhs demos/dll-light.tape
+
+demo-dll: demo-dll-dark demo-dll-light
 
 # Run a single non-TUI demo module:  make run-<name>
 #   Note: demo files contain only class definitions (no __main__),

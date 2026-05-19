@@ -355,6 +355,7 @@ class BaseLinearStructureTUI(App):
         self.query_one(RichLog).write(
             f"[bold]{self.STRUCTURE_NAME} Demo[/bold] — type [cyan]/help[/cyan] for commands."
         )
+        self.query_one(Input).focus()
 
     @on(Input.Submitted)
     def handle_command(self, event: Input.Submitted) -> None:

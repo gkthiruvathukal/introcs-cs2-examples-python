@@ -166,3 +166,8 @@ cython_debug/
 *.swo
 .*.swp
 .*.swo
+
+# Generated demo videos / recordings
+demos/*.mp4
+demos/*.gif
+demos/*.cast
