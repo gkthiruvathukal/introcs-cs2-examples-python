@@ -72,3 +72,25 @@ def test_clear(deque_demo):
     deque_demo.clear()
     assert deque_demo.size() == 0
     assert deque_demo.to_list() == []
+
+
+# find
+
+def test_find_returns_index_of_existing_item(deque_demo):
+    deque_demo.add_to_back(10)
+    deque_demo.add_to_back(20)
+    deque_demo.add_to_back(30)
+    assert deque_demo.find(20) == 1
+
+
+def test_find_returns_none_when_not_found(deque_demo):
+    deque_demo.add_to_back(10)
+    deque_demo.add_to_back(20)
+    assert deque_demo.find(99) is None
+
+
+def test_find_returns_first_match(deque_demo):
+    deque_demo.add_to_back(10)
+    deque_demo.add_to_back(20)
+    deque_demo.add_to_back(10)
+    assert deque_demo.find(10) == 0

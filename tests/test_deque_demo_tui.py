@@ -1,5 +1,8 @@
+import asyncio
+
+from textual.widgets import Input, RichLog
+
 from data_structures.deque_demo_tui import DequeDemoTUI, DequePanel
-from data_structures.capture_utils import default_session_name
 
 
 def test_deque_tui_prepend_and_append_preserve_ends():
@@ -26,11 +29,42 @@ def test_deque_panel_labels_show_displacement_from_both_ends():
     assert DequePanel._format_back_label(3, 4) == "back"
 
 
-def test_deque_tui_structure_slug_is_deque():
-    assert DequeDemoTUI.STRUCTURE_SLUG == "deque"
-
-
-def test_deque_tui_capture_initially_disabled():
+def test_deque_tui_placeholder_mentions_search():
     app = DequeDemoTUI()
-    assert not app.capture_enabled
-    assert app.capture_session_name == default_session_name("deque")
+    assert "/search" in app.placeholder_text()
+
+
+def test_deque_tui_search_found():
+    async def scenario():
+        app = DequeDemoTUI(max_size=5)
+        async with app.run_test() as pilot:
+            input_widget = app.query_one(Input)
+            input_widget.post_message(Input.Submitted(input_widget, "/push-back 10"))
+            await pilot.pause()
+            input_widget.post_message(Input.Submitted(input_widget, "/push-back 20"))
+            await pilot.pause()
+            input_widget.post_message(Input.Submitted(input_widget, "/push-back 30"))
+            await pilot.pause()
+            input_widget.post_message(Input.Submitted(input_widget, "/search 20"))
+            await pilot.pause()
+            log = app.query_one(RichLog)
+            assert any("found at index 1" in line.text for line in log.lines[-5:])
+
+    asyncio.run(scenario())
+
+
+def test_deque_tui_search_not_found():
+    async def scenario():
+        app = DequeDemoTUI(max_size=5)
+        async with app.run_test() as pilot:
+            input_widget = app.query_one(Input)
+            input_widget.post_message(Input.Submitted(input_widget, "/push-back 10"))
+            await pilot.pause()
+            input_widget.post_message(Input.Submitted(input_widget, "/search 99"))
+            await pilot.pause()
+            log = app.query_one(RichLog)
+            assert any("not found" in line.text for line in log.lines[-5:])
+
+    asyncio.run(scenario())
+
+

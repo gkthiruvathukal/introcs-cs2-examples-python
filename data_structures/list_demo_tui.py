@@ -14,7 +14,6 @@ from data_structures.tui_common import (
 
 class ListDemoTUI(BaseLinearStructureTUI):
     STRUCTURE_NAME = "List"
-    STRUCTURE_SLUG = "list"
     START_LABEL = "first"
     END_LABEL = "last"
 
@@ -42,19 +41,20 @@ class ListDemoTUI(BaseLinearStructureTUI):
         return f"index → value: {list(enumerate(self.get_items()))!r}"
 
     def placeholder_text(self) -> str:
-        return "/help  /append <v...>  /insert <index> <value>  /random <n>  /remove-value <value>  /remove-at <index>  /get <index>  /set <index> <value>  /clear  /save <file>  /load <file>  /undo  /redo  /type [int|float|str|bool|any]  /quit"
+        return "/help  /append VALUE  /insert INDEX VALUE  /remove-value VALUE  /remove-at INDEX  /search VALUE  /get INDEX  /set INDEX VALUE  /quit"
 
     def format_position_label(self, index: int, item_count: int, start_label: str, end_label: str) -> str:
         return str(index)
 
     def help_lines(self) -> list[str]:
         return [
-            "  [cyan]/append <value> [more ...][/cyan]   add one or more values at the end",
-            "  [cyan]/insert <index> <value>[/cyan]      insert one value at the given index",
-            "  [cyan]/remove-value <value>[/cyan]        remove the first matching value",
-            "  [cyan]/remove-at <index>[/cyan]           remove the value at the given index",
-            "  [cyan]/get <index>[/cyan]                 inspect the value at the given index",
-            "  [cyan]/set <index> <value>[/cyan]         replace the value at the given index",
+            "  [cyan]/append[/cyan] VALUE [VALUE ...]     add one or more values at the end",
+            "  [cyan]/insert[/cyan] INDEX VALUE           insert one value at the given index",
+            "  [cyan]/remove-value[/cyan] VALUE           remove the first matching value",
+            "  [cyan]/remove-at[/cyan] INDEX              remove the value at the given index",
+            "  [cyan]/search[/cyan] VALUE                 search for a value",
+            "  [cyan]/get[/cyan] INDEX                    inspect the value at the given index",
+            "  [cyan]/set[/cyan] INDEX VALUE              replace the value at the given index",
         ]
 
     def handle_structure_command(self, verb: str, arg: str | None, log: RichLog) -> bool:
@@ -126,6 +126,21 @@ class ListDemoTUI(BaseLinearStructureTUI):
                 log.write(f"[red]RangeError: {e}[/red]")
             return True
 
+        if verb == "/search":
+            if arg is None:
+                log.write("[red]Usage: /search VALUE[/red]")
+                return True
+            try:
+                value = self._convert_many(parse_value_tokens(arg, "Usage: /search VALUE", 1, 1))[0]
+                result = self.demo.find(value)
+                if result is None:
+                    log.write(f"[cyan]search({value!r}) → not found[/cyan]")
+                else:
+                    log.write(f"[cyan]search({value!r}) → found at index {result}[/cyan]")
+            except TypeError as e:
+                log.write(f"[red]TypeError: {e}[/red]")
+            return True
+
         if verb in {"/get", "/at"}:
             if arg is None:
                 log.write(f"[red]Usage: {verb} <index>[/red]")
@@ -174,8 +189,6 @@ def main() -> None:
         int_max=args.int_max,
         float_min=args.float_min,
         float_max=args.float_max,
-        capture_dir=args.capture_dir,
-        video_dir=args.video_dir,
     ).run()
 
 

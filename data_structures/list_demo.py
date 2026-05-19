@@ -50,6 +50,13 @@ class ListDemo:
         """Remove all items from the list."""
         self.lst.clear()
 
+    def find(self, item):
+        """Return the index of the first matching item, or None if not found."""
+        try:
+            return self.lst.index(item)
+        except ValueError:
+            return None
+
     def to_list(self):
         """Return a shallow copy of the list contents."""
         return list(self.lst)

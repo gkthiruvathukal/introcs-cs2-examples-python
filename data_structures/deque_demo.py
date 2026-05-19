@@ -66,6 +66,13 @@ class DequeDemo:
             raise IndexError("Index out of range")
         return self.dq[index]
 
+    def find(self, item):
+        """Return the index (from front) of the first matching item, or None if not found."""
+        for index, value in enumerate(self.dq):
+            if value == item:
+                return index
+        return None
+
     def to_list(self):
         """Return the deque contents from front to back."""
         return list(self.dq)

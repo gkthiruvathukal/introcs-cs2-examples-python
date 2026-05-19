@@ -28,30 +28,122 @@ class SinglyLinkedList:
             current.next = new_node
         self._size += 1
 
-    def remove(self, data):
-        """Remove a node by value."""
+    def _node_at(self, index):
+        """Return (prev, node) at position index (0-based from head)."""
+        if index < 0 or index >= self._size:
+            raise IndexError(f"Index {index} out of range for list of size {self._size}")
+        prev = None
         current = self.head
-        previous = None
+        for _ in range(index):
+            prev = current
+            current = current.next
+        return (prev, current)
+
+    def _find_node(self, node_id):
+        """Return (prev, node) for the node with the given node_id, or (None, None) if not found."""
+        prev = None
+        current = self.head
+        while current:
+            if current.node_id == node_id:
+                return (prev, current)
+            prev = current
+            current = current.next
+        return (None, None)
+
+    def _unlink(self, prev, node):
+        if prev is None:
+            self.head = node.next
+        else:
+            prev.next = node.next
+        self._size -= 1
+
+    def _insert_before_node(self, prev, node, data, node_id=None):
+        if node_id is None:
+            node_id = self._next_node_id
+            self._next_node_id += 1
+        else:
+            self._next_node_id = max(self._next_node_id, node_id + 1)
+        new_node = Node(data, node_id=node_id)
+        new_node.next = node
+        if prev is None:
+            self.head = new_node
+        else:
+            prev.next = new_node
+        self._size += 1
+
+    def _insert_after_node(self, node, data, node_id=None):
+        if node_id is None:
+            node_id = self._next_node_id
+            self._next_node_id += 1
+        else:
+            self._next_node_id = max(self._next_node_id, node_id + 1)
+        new_node = Node(data, node_id=node_id)
+        new_node.next = node.next
+        node.next = new_node
+        self._size += 1
+
+    def remove(self, data):
+        """Remove the first node with the given value."""
+        prev = None
+        current = self.head
         while current:
             if current.data == data:
-                if previous:
-                    previous.next = current.next
-                else:
-                    self.head = current.next
-                self._size -= 1
+                self._unlink(prev, current)
                 return
-            previous = current
+            prev = current
             current = current.next
         raise ValueError("Value not found in the list")
 
+    def remove_at(self, index):
+        """Remove the node at position index (0-based from head)."""
+        prev, node = self._node_at(index)
+        self._unlink(prev, node)
+
+    def remove_by_node_id(self, node_id):
+        """Remove the node with the given node_id."""
+        prev, node = self._find_node(node_id)
+        if node is None:
+            raise ValueError(f"No node with id {node_id}")
+        self._unlink(prev, node)
+
+    def insert_at(self, index, data, node_id=None):
+        """Insert data before the node at position index (0 = new head, size = new tail)."""
+        if index < 0 or index > self._size:
+            raise IndexError(f"Insert index {index} out of range for list of size {self._size}")
+        if index == self._size:
+            self.insert(data, node_id=node_id)
+        else:
+            prev, node = self._node_at(index)
+            self._insert_before_node(prev, node, data, node_id=node_id)
+
+    def insert_after(self, node_id, data, new_node_id=None):
+        """Insert data immediately after the node with the given node_id."""
+        prev, node = self._find_node(node_id)
+        if node is None:
+            raise ValueError(f"No node with id {node_id}")
+        self._insert_after_node(node, data, node_id=new_node_id)
+
+    def insert_before(self, node_id, data, new_node_id=None):
+        """Insert data immediately before the node with the given node_id."""
+        prev, node = self._find_node(node_id)
+        if node is None:
+            raise ValueError(f"No node with id {node_id}")
+        self._insert_before_node(prev, node, data, node_id=new_node_id)
+
     def search(self, data):
-        """Search for a node by value."""
+        """Return True if data is found, False otherwise."""
+        return self.find(data) is not None
+
+    def find(self, data):
+        """Return (index, node_id) for the first matching node, or None if not found."""
         current = self.head
+        index = 0
         while current:
             if current.data == data:
-                return True
+                return (index, current.node_id)
             current = current.next
-        return False
+            index += 1
+        return None
 
     def size(self):
         """Return the size of the list."""

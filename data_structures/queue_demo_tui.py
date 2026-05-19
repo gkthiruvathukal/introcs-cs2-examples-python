@@ -12,7 +12,6 @@ from data_structures.tui_common import (
 
 class QueueDemoTUI(BaseLinearStructureTUI):
     STRUCTURE_NAME = "Queue"
-    STRUCTURE_SLUG = "queue"
     START_LABEL = "front"
     END_LABEL = "back"
 
@@ -40,16 +39,17 @@ class QueueDemoTUI(BaseLinearStructureTUI):
         return f"front → back: {self.get_items()!r}"
 
     def placeholder_text(self) -> str:
-        return "/help  /enqueue <v...>  /random <n>  /dequeue  /peek  /at <index>  /swap  /rotate  /clear  /save <file>  /load <file>  /undo  /redo  /type [int|float|str|bool|any]  /quit"
+        return "/help  /enqueue VALUE  /dequeue  /peek  /search VALUE  /at INDEX  /swap  /rotate  /quit"
 
     def help_lines(self) -> list[str]:
         return [
-            "  [cyan]/enqueue <value> [more ...][/cyan]  add one or more values at the back",
-            "  [cyan]/dequeue[/cyan]                    remove the front value",
-            "  [cyan]/peek[/cyan]                       inspect the front value",
-            "  [cyan]/at <index>[/cyan]                 inspect 0,1,2,... relative to the front",
-            "  [cyan]/swap[/cyan]                       swap the front two values",
-            "  [cyan]/rotate[/cyan]                     rotate the front three values",
+            "  [cyan]/enqueue[/cyan] VALUE [VALUE ...]   add one or more values at the back",
+            "  [cyan]/dequeue[/cyan]                     remove the front value",
+            "  [cyan]/peek[/cyan]                        inspect the front value",
+            "  [cyan]/search[/cyan] VALUE                search for a value",
+            "  [cyan]/at[/cyan] INDEX                    inspect 0,1,2,... relative to the front",
+            "  [cyan]/swap[/cyan]                        swap the front two values",
+            "  [cyan]/rotate[/cyan]                      rotate the front three values",
         ]
 
     def handle_structure_command(self, verb: str, arg: str | None, log: RichLog) -> bool:
@@ -128,6 +128,21 @@ class QueueDemoTUI(BaseLinearStructureTUI):
                 log.write(f"[red]Underflow: {e}[/red]")
             return True
 
+        if verb == "/search":
+            if arg is None:
+                log.write("[red]Usage: /search VALUE[/red]")
+                return True
+            try:
+                value = self._convert_many(parse_value_tokens(arg, "Usage: /search VALUE", 1, 1))[0]
+                result = self.demo.find(value)
+                if result is None:
+                    log.write(f"[cyan]search({value!r}) → not found[/cyan]")
+                else:
+                    log.write(f"[cyan]search({value!r}) → found at index {result}[/cyan]")
+            except TypeError as e:
+                log.write(f"[red]TypeError: {e}[/red]")
+            return True
+
         if verb == "/at":
             if arg is None:
                 log.write("[red]Usage: /at <non-negative-index>[/red]")
@@ -157,8 +172,6 @@ def main() -> None:
         int_max=args.int_max,
         float_min=args.float_min,
         float_max=args.float_max,
-        capture_dir=args.capture_dir,
-        video_dir=args.video_dir,
     ).run()
 
 

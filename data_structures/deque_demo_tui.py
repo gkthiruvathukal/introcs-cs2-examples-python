@@ -98,7 +98,6 @@ class DequePanel(LinearPanel):
 
 class DequeDemoTUI(BaseLinearStructureTUI):
     STRUCTURE_NAME = "Deque"
-    STRUCTURE_SLUG = "deque"
     START_LABEL = "front"
     END_LABEL = "back"
 
@@ -139,19 +138,20 @@ class DequeDemoTUI(BaseLinearStructureTUI):
         return f"front → back: {self.get_items()!r}"
 
     def placeholder_text(self) -> str:
-        return "/help  /push-front <v...>  /push-back <v...>  /random <n>  /pop-front  /pop-back  /peek-front  /peek-back  /at <index>  /clear  /session <name>  /capture [on|off]  /video [session] [seconds]  /save <file>  /load <file>  /undo  /redo  /type [int|float|str|bool|any]  /quit"
+        return "/help  /push-front VALUE  /push-back VALUE  /pop-front  /pop-back  /peek-front  /peek-back  /search VALUE  /at INDEX  /quit"
 
     def help_lines(self) -> list[str]:
         return [
-            "  [cyan]/push-front <value> [more ...][/cyan]  add one or more values at the front",
-            "  [cyan]/push-back <value> [more ...][/cyan]   add one or more values at the back",
-            "  [cyan]/pop-front[/cyan]                   remove the front value",
-            "  [cyan]/pop-back[/cyan]                    remove the back value",
-            "  [cyan]/peek-front[/cyan]                  inspect the front value",
-            "  [cyan]/peek-back[/cyan]                   inspect the back value",
-            "  [cyan]/set-front <value>[/cyan]           replace the front value",
-            "  [cyan]/set-back <value>[/cyan]            replace the back value",
-            "  [cyan]/at <index>[/cyan]                  inspect 0,1,2,... relative to the front",
+            "  [cyan]/push-front[/cyan] VALUE [VALUE ...]  add one or more values at the front",
+            "  [cyan]/push-back[/cyan] VALUE [VALUE ...]   add one or more values at the back",
+            "  [cyan]/pop-front[/cyan]                     remove the front value",
+            "  [cyan]/pop-back[/cyan]                      remove the back value",
+            "  [cyan]/peek-front[/cyan]                    inspect the front value",
+            "  [cyan]/peek-back[/cyan]                     inspect the back value",
+            "  [cyan]/set-front[/cyan] VALUE               replace the front value",
+            "  [cyan]/set-back[/cyan] VALUE                replace the back value",
+            "  [cyan]/search[/cyan] VALUE                  search for a value",
+            "  [cyan]/at[/cyan] INDEX                      inspect 0,1,2,... relative to the front",
         ]
 
     def handle_structure_command(self, verb: str, arg: str | None, log: RichLog) -> bool:
@@ -212,6 +212,21 @@ class DequeDemoTUI(BaseLinearStructureTUI):
                 log.write(f"[red]{f'{label}: ' if label else ''}{e}[/red]")
             return True
 
+        if verb == "/search":
+            if arg is None:
+                log.write("[red]Usage: /search VALUE[/red]")
+                return True
+            try:
+                value = self._convert_many(parse_value_tokens(arg, "Usage: /search VALUE", 1, 1))[0]
+                result = self.demo.find(value)
+                if result is None:
+                    log.write(f"[cyan]search({value!r}) → not found[/cyan]")
+                else:
+                    log.write(f"[cyan]search({value!r}) → found at index {result}[/cyan]")
+            except TypeError as e:
+                log.write(f"[red]TypeError: {e}[/red]")
+            return True
+
         if verb == "/at":
             if arg is None:
                 log.write("[red]Usage: /at <non-negative-index>[/red]")
@@ -252,8 +267,6 @@ def main() -> None:
         int_max=args.int_max,
         float_min=args.float_min,
         float_max=args.float_max,
-        capture_dir=args.capture_dir,
-        video_dir=args.video_dir,
     ).run()
 
 

@@ -94,3 +94,25 @@ def test_rotate_requires_three_items(queue):
     queue.enqueue(20)
     with pytest.raises(IndexError):
         queue.rotate()
+
+
+# find
+
+def test_find_returns_index_of_existing_item(queue):
+    queue.enqueue(10)
+    queue.enqueue(20)
+    queue.enqueue(30)
+    assert queue.find(20) == 1
+
+
+def test_find_returns_none_when_not_found(queue):
+    queue.enqueue(10)
+    queue.enqueue(20)
+    assert queue.find(99) is None
+
+
+def test_find_returns_first_match(queue):
+    queue.enqueue(10)
+    queue.enqueue(20)
+    queue.enqueue(10)
+    assert queue.find(10) == 0

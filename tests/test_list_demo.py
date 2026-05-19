@@ -69,3 +69,20 @@ def test_clear(list_demo):
     list_demo.clear()
     assert list_demo.size() == 0
     assert list_demo.to_list() == []
+
+
+# find
+
+def test_find_returns_index_of_existing_item(list_demo):
+    add_items(list_demo, [10, 20, 30])
+    assert list_demo.find(20) == 1
+
+
+def test_find_returns_none_when_not_found(list_demo):
+    add_items(list_demo, ITEMS)
+    assert list_demo.find(99) is None
+
+
+def test_find_returns_first_match(list_demo):
+    add_items(list_demo, [10, 20, 10])
+    assert list_demo.find(10) == 0

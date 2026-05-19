@@ -266,7 +266,6 @@ class StackPanel(Static):
 
 class StackDemoTUI(BaseLinearStructureTUI):
     STRUCTURE_NAME = "Stack"
-    STRUCTURE_SLUG = "stack"
     START_LABEL = "bottom"
     END_LABEL = "top"
     DEFAULT_TYPE = "int"
@@ -331,14 +330,14 @@ class StackDemoTUI(BaseLinearStructureTUI):
         return f"stack top → bottom: {list(reversed(self.demo.stack))!r}"
 
     def placeholder_text(self) -> str:
-        return "/help  /push <v...>  /random <n>  /pop  /peek  /at <index>  /dup  /swap  /rotate  /clear  /session <name>  /capture [on|off]  /video [session] [seconds]  /save <file>  /load <file>  /undo  /redo  /type [int|float|str|bool|any]  /quit"
+        return "/help  /push <v...>  /random <n>  /pop  /peek  /at <index>  /dup  /swap  /rotate  /clear  /save <file>  /load <file>  /undo  /redo  /type [int|float|str|bool|any]  /quit"
 
     def help_lines(self) -> list[str]:
         return [
-            "  [cyan]/push <value> [more ...][/cyan]    push one or more values onto the stack",
+            "  [cyan]/push[/cyan] VALUE [VALUE ...]      push one or more values onto the stack",
             "  [cyan]/pop[/cyan]                        pop the top value",
             "  [cyan]/peek[/cyan]                       inspect the top value",
-            "  [cyan]/at <index>[/cyan]                 inspect 0,1,2,... relative to the top",
+            "  [cyan]/at[/cyan] INDEX                   inspect 0,1,2,... relative to the top",
             "  [cyan]/dup[/cyan]                        duplicate the top value",
             "  [cyan]/swap[/cyan]                       swap the top two values",
             "  [cyan]/rotate[/cyan]                     rotate the top three values",
@@ -483,8 +482,6 @@ def main() -> None:
         int_max=args.int_max,
         float_min=args.float_min,
         float_max=args.float_max,
-        capture_dir=args.capture_dir,
-        video_dir=args.video_dir,
     ).run()
 
 

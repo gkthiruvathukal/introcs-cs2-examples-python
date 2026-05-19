@@ -9,17 +9,6 @@ from textual import on
 from textual.app import App, ComposeResult
 from textual.widgets import Footer, Header, Input, RichLog, Static
 
-from data_structures.capture_utils import (
-    append_capture_frame,
-    default_session_name,
-    ensure_capture_session,
-    next_frame_paths,
-    parse_capture_mode,
-    parse_session_arg,
-    parse_video_args,
-    render_capture_video,
-    render_text_frame_image,
-)
 
 INT32_MIN = -(2 ** 31)
 INT32_MAX = 2 ** 31 - 1
@@ -323,7 +312,6 @@ class BaseLinearStructureTUI(App):
     ]
 
     STRUCTURE_NAME = "Structure"
-    STRUCTURE_SLUG = "structure"
     START_LABEL = "start"
     END_LABEL = "end"
     DEFAULT_TYPE = "int"
@@ -339,8 +327,6 @@ class BaseLinearStructureTUI(App):
         int_max: int = INT32_MAX,
         float_min: float = FLOAT32_MIN,
         float_max: float = FLOAT32_MAX,
-        capture_dir: Path | None = None,
-        video_dir: Path | None = None,
     ):
         super().__init__()
         self.max_size = max_size
@@ -350,16 +336,12 @@ class BaseLinearStructureTUI(App):
         self.int_max = int_max
         self.float_min = float_min
         self.float_max = float_max
-        self.capture_dir = capture_dir if capture_dir is not None else Path.cwd() / ".capture"
-        self.video_dir = video_dir if video_dir is not None else Path.cwd() / ".video"
         self.random = random.Random()
         self.words = load_words()
         self.undo_history = []
         self.redo_history = []
         self.element_type = None
         self.set_type(self.DEFAULT_TYPE)
-        self.capture_session_name = default_session_name(self.STRUCTURE_SLUG)
-        self.capture_enabled = False
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -386,8 +368,6 @@ class BaseLinearStructureTUI(App):
             elapsed_ns = time.perf_counter_ns() - started
             log = self.query_one(RichLog)
             log.write(f"[dim]time: {format_elapsed_ns(elapsed_ns)}[/dim]")
-            if verb not in ("/capture", "/session", "/quit", "/exit"):
-                self._maybe_capture_frame(raw, elapsed_ns, log)
 
     def action_scroll_up(self) -> None:
         self._scroll_by(1)
@@ -659,76 +639,28 @@ class BaseLinearStructureTUI(App):
         elif verb in ("/quit", "/exit"):
             self.exit()
 
-        elif verb == "/session":
-            try:
-                session_name = parse_session_arg(arg)
-                self.capture_session_name = session_name
-                ensure_capture_session(self.STRUCTURE_SLUG, session_name, self.capture_dir)
-                log.write(f"[green]session({session_name!r}) selected for future captures[/green]")
-            except ValueError as e:
-                log.write(f"[red]{e}[/red]")
-
-        elif verb == "/capture":
-            try:
-                mode = parse_capture_mode(arg)
-                if mode == "on":
-                    ensure_capture_session(self.STRUCTURE_SLUG, self.capture_session_name, self.capture_dir)
-                    self.capture_enabled = True
-                    log.write(
-                        f"[green]capture(on)[/green] "
-                        f"[dim]session={self.capture_session_name!r}[/dim]"
-                    )
-                else:
-                    self.capture_enabled = False
-                    log.write(
-                        f"[green]capture(off)[/green] "
-                        f"[dim]session remains {self.capture_session_name!r}[/dim]"
-                    )
-            except ValueError as e:
-                log.write(f"[red]{e}[/red]")
-
-        elif verb == "/video":
-            try:
-                session_name, seconds_per_frame = parse_video_args(arg)
-                session_name = session_name or self.capture_session_name
-                output_path = render_capture_video(
-                    self.STRUCTURE_SLUG,
-                    session_name,
-                    seconds_per_frame,
-                    capture_dir=self.capture_dir,
-                    video_dir=self.video_dir,
-                )
-                log.write(
-                    f"[green]video({session_name!r}) wrote {str(output_path)!r}[/green] "
-                    f"[dim]captions default to commands; {seconds_per_frame:g}s per frame[/dim]"
-                )
-            except (ValueError, OSError, RuntimeError) as e:
-                log.write(f"[red]Video failed: {e}[/red]")
-            except Exception as e:
-                log.write(f"[red]Video failed: {e}[/red]")
-
         elif verb == "/help":
             lines = [
                 "[bold]Commands[/bold]",
+                f"  [bold]--- {self.STRUCTURE_NAME} ---[/bold]",
                 *self.help_lines(),
+                "",
+                "  [bold]--- Common ---[/bold]",
             ]
             if self.ENABLE_RANDOM:
-                lines.append("  [cyan]/random <n>[/cyan]                 append n random values for the current type")
+                lines.append("  [cyan]/random[/cyan] N                    append N random values for the current type")
             lines.extend(
                 [
                     "  [cyan]/clear[/cyan]                      remove all values",
-                    "  [cyan]/session <name>[/cyan]              set the session name for future captured frames",
-                    "  [cyan]/capture [on|off][/cyan]            enable or suspend frame capture for the active session",
-                    "  [cyan]/video [session] [seconds][/cyan]  build an mp4 from captured frames; defaults to current session and 5s",
-                    "  [cyan]/save <path>[/cyan]                save the current type and contents",
-                    "  [cyan]/load <path>[/cyan]                load a saved session into a fresh structure",
+                    "  [cyan]/save[/cyan] PATH                  save the current type and contents",
+                    "  [cyan]/load[/cyan] PATH                  load a saved session into a fresh structure",
                     "  [cyan]/undo[/cyan]                       restore the previous state",
                     "  [cyan]/redo[/cyan]                       restore the next undone state",
                     "  [cyan]/show[/cyan]  [cyan]/print[/cyan]                display current contents",
                     "  [cyan]/up[/cyan]  [cyan]/down[/cyan]                  scroll visible middle rows",
                     "  [cyan]/pageup[/cyan]  [cyan]/pagedown[/cyan]          page through middle rows",
                     "  [cyan]/home[/cyan]                       jump back to the newest visible window",
-                    "  [cyan]/type [int|float|str|bool|any][/cyan]  get or set element type constraint",
+                    "  [cyan]/type[/cyan] int|float|str|bool|any  get or set element type constraint",
                     "  [cyan]bool values[/cyan]                 true/false, yes/no, on/off, 1/0",
                     "  [cyan]/help[/cyan]                       show this help",
                     "  [cyan]/quit[/cyan]  [cyan]Ctrl+D[/cyan]                exit",
@@ -738,42 +670,6 @@ class BaseLinearStructureTUI(App):
 
         else:
             log.write(f"[red]Unknown command: {verb!r} — type /help[/red]")
-
-
-    def _maybe_capture_frame(self, raw: str, elapsed_ns: int, log: RichLog) -> None:
-        if not self.capture_enabled or not self.capture_session_name:
-            return
-        try:
-            text_path, png_path, _ = next_frame_paths(self.STRUCTURE_SLUG, self.capture_session_name, self.capture_dir)
-            text_path.write_text(self._capture_frame_text(), encoding="utf-8")
-            render_text_frame_image(text_path, png_path)
-            append_capture_frame(
-                self.STRUCTURE_SLUG,
-                self.capture_session_name,
-                command=raw,
-                elapsed_ns=elapsed_ns,
-                screenshot_path=text_path,
-                capture_dir=self.capture_dir,
-            )
-            log.write(
-                f"[dim]captured frame for session {self.capture_session_name!r}: {png_path.name}[/dim]"
-            )
-        except Exception as e:
-            log.write(f"[red]Capture failed: {e}[/red]")
-
-    def _capture_frame_text(self) -> str:
-        panel = self.query_one("#panel")
-        log = self.query_one(RichLog)
-        recent_lines = [line.text for line in log.lines[-8:]]
-        sections = [
-            f"{self.STRUCTURE_NAME} TUI CAPTURE",
-            "",
-            str(panel.content),
-            "",
-            "Recent log:",
-            *recent_lines,
-        ]
-        return "\n".join(sections)
 
 
 def build_linear_parser(description: str) -> argparse.ArgumentParser:
@@ -816,19 +712,5 @@ def build_linear_parser(description: str) -> argparse.ArgumentParser:
         default=FLOAT32_MAX,
         metavar="X",
         help=f"Maximum random float for /random under float or any (default: {FLOAT32_MAX})",
-    )
-    parser.add_argument(
-        "--capture-dir",
-        type=Path,
-        default=Path.cwd() / ".capture",
-        metavar="PATH",
-        help="Directory for captured frame sessions (default: ./.capture)",
-    )
-    parser.add_argument(
-        "--video-dir",
-        type=Path,
-        default=Path.cwd() / ".video",
-        metavar="PATH",
-        help="Directory for rendered videos (default: ./.video)",
     )
     return parser

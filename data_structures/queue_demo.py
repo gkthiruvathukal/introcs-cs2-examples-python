@@ -61,6 +61,13 @@ class QueueDemo:
             raise IndexError("Index out of range")
         return self.queue[index]
 
+    def find(self, item):
+        """Return the index (from front) of the first matching item, or None if not found."""
+        for index, value in enumerate(self.queue):
+            if value == item:
+                return index
+        return None
+
     def to_list(self):
         """Return the queue contents from front to back."""
         return list(self.queue)

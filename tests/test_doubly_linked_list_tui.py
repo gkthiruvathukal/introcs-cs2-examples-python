@@ -116,3 +116,128 @@ def test_doubly_linked_list_tui_append_submitted_once():
             assert len(app.demo.node_snapshots()) == 1
 
     asyncio.run(scenario())
+
+
+def _submit(app, command):
+    input_widget = app.query_one(Input)
+    input_widget.post_message(Input.Submitted(input_widget, command))
+
+
+def test_tui_insert_at_head():
+    async def scenario():
+        app = DoublyLinkedListTUI(max_size=10)
+        async with app.run_test() as pilot:
+            _submit(app, "/append 10")
+            _submit(app, "/append 20")
+            await pilot.pause()
+            _submit(app, "/insert-at 0 5")
+            await pilot.pause()
+            assert app.get_items() == [5, 10, 20]
+
+    asyncio.run(scenario())
+
+
+def test_tui_insert_at_tail():
+    async def scenario():
+        app = DoublyLinkedListTUI(max_size=10)
+        async with app.run_test() as pilot:
+            _submit(app, "/append 10")
+            _submit(app, "/append 20")
+            await pilot.pause()
+            _submit(app, "/insert-at 2 30")
+            await pilot.pause()
+            assert app.get_items() == [10, 20, 30]
+
+    asyncio.run(scenario())
+
+
+def test_tui_insert_after():
+    async def scenario():
+        app = DoublyLinkedListTUI(max_size=10)
+        async with app.run_test() as pilot:
+            _submit(app, "/append 10")
+            _submit(app, "/append 20")
+            await pilot.pause()
+            node_id = app.demo.node_snapshots()[0]["node_id"]
+            _submit(app, f"/insert-after {node_id} 15")
+            await pilot.pause()
+            assert app.get_items() == [10, 15, 20]
+
+    asyncio.run(scenario())
+
+
+def test_tui_insert_before_head():
+    async def scenario():
+        app = DoublyLinkedListTUI(max_size=10)
+        async with app.run_test() as pilot:
+            _submit(app, "/append 10")
+            _submit(app, "/append 20")
+            await pilot.pause()
+            node_id = app.demo.node_snapshots()[0]["node_id"]
+            _submit(app, f"/insert-before {node_id} 5")
+            await pilot.pause()
+            assert app.get_items() == [5, 10, 20]
+            assert app.demo.head.data == 5
+
+    asyncio.run(scenario())
+
+
+def test_tui_remove_at():
+    async def scenario():
+        app = DoublyLinkedListTUI(max_size=10)
+        async with app.run_test() as pilot:
+            _submit(app, "/append 10")
+            _submit(app, "/append 20")
+            _submit(app, "/append 30")
+            await pilot.pause()
+            _submit(app, "/remove-at 1")
+            await pilot.pause()
+            assert app.get_items() == [10, 30]
+
+    asyncio.run(scenario())
+
+
+def test_tui_remove_node():
+    async def scenario():
+        app = DoublyLinkedListTUI(max_size=10)
+        async with app.run_test() as pilot:
+            _submit(app, "/append 10")
+            _submit(app, "/append 20")
+            await pilot.pause()
+            node_id = app.demo.node_snapshots()[0]["node_id"]
+            _submit(app, f"/remove-node {node_id}")
+            await pilot.pause()
+            assert app.get_items() == [20]
+            assert app.demo.head.data == 20
+
+    asyncio.run(scenario())
+
+
+def test_tui_insert_at_missing_arg_shows_error():
+    async def scenario():
+        from textual.widgets import RichLog
+        app = DoublyLinkedListTUI(max_size=10)
+        async with app.run_test() as pilot:
+            _submit(app, "/insert-at")
+            await pilot.pause()
+            log = app.query_one(RichLog)
+            recent = [line.text for line in log.lines[-5:]]
+            assert any("Usage" in text for text in recent)
+
+    asyncio.run(scenario())
+
+
+def test_tui_remove_node_not_found_shows_error():
+    async def scenario():
+        from textual.widgets import RichLog
+        app = DoublyLinkedListTUI(max_size=10)
+        async with app.run_test() as pilot:
+            _submit(app, "/append 10")
+            await pilot.pause()
+            _submit(app, "/remove-node 9999")
+            await pilot.pause()
+            log = app.query_one(RichLog)
+            recent = [line.text for line in log.lines[-5:]]
+            assert any("9999" in text for text in recent)
+
+    asyncio.run(scenario())

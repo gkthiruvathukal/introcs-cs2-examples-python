@@ -276,7 +276,6 @@ class SinglyLinkedListTUI(BaseLinearStructureTUI):
     """
 
     STRUCTURE_NAME = "Singly Linked List"
-    STRUCTURE_SLUG = "sll"
     START_LABEL = "head"
     END_LABEL = "tail"
 
@@ -331,14 +330,19 @@ class SinglyLinkedListTUI(BaseLinearStructureTUI):
         return "head -> " + " -> ".join(repr(item) for item in items) + " -> None"
 
     def placeholder_text(self) -> str:
-        return "/help  /append <v...>  /random <n>  /remove-value <value>  /search <value>  /at <index>  /clear  /save <file>  /load <file>  /undo  /redo  /type [int|float|str|bool|any]  /quit"
+        return "/help  /append VALUE  /insert-at INDEX VALUE  /insert-after NODE-ID VALUE  /insert-before NODE-ID VALUE  /remove-at INDEX  /remove-node NODE-ID  /remove-value VALUE  /search VALUE  /at INDEX  /quit"
 
     def help_lines(self) -> list[str]:
         return [
-            "  [cyan]/append <value> [more ...][/cyan]   add one or more values at the tail",
-            "  [cyan]/remove-value <value>[/cyan]        remove the first matching node",
-            "  [cyan]/search <value>[/cyan]              search for a value",
-            "  [cyan]/at <index>[/cyan]                  inspect 0,1,2,... relative to the head",
+            "  [cyan]/append[/cyan] VALUE [VALUE ...]     add one or more values at the tail",
+            "  [cyan]/insert-at[/cyan] INDEX VALUE        insert before position (0 = new head)",
+            "  [cyan]/insert-after[/cyan] NODE-ID VALUE   insert after the node with that id",
+            "  [cyan]/insert-before[/cyan] NODE-ID VALUE  insert before the node with that id",
+            "  [cyan]/remove-at[/cyan] INDEX              remove the node at position index",
+            "  [cyan]/remove-node[/cyan] NODE-ID          remove the node with that id",
+            "  [cyan]/remove-value[/cyan] VALUE           remove the first matching node",
+            "  [cyan]/search[/cyan] VALUE                 search for a value",
+            "  [cyan]/at[/cyan] INDEX                     inspect 0,1,2,... relative to the head",
         ]
 
     def handle_structure_command(self, verb: str, arg: str | None, log: RichLog) -> bool:
@@ -360,6 +364,82 @@ class SinglyLinkedListTUI(BaseLinearStructureTUI):
                 log.write(f"[red]{f'{label}: ' if label else ''}{e}[/red]")
             return True
 
+        if verb == "/insert-at":
+            if arg is None:
+                log.write("[red]Usage: /insert-at INDEX VALUE[/red]")
+                return True
+            try:
+                tokens = parse_value_tokens(arg, "Usage: /insert-at INDEX VALUE", 2, 2)
+                index = nonnegative_int(tokens[0])
+                value = self._convert_item(tokens[1])
+                self._record_undo_state()
+                self.demo.insert_at(index, value)
+                self.scroll_offset = 0
+                log.write(f"[green]insert-at({index}, {value!r})  {self.show_state_text()}  size={self.structure_size()}[/green]")
+            except (IndexError, OverflowError, TypeError, ValueError, argparse.ArgumentTypeError) as e:
+                log.write(f"[red]{e}[/red]")
+            return True
+
+        if verb == "/insert-after":
+            if arg is None:
+                log.write("[red]Usage: /insert-after NODE-ID VALUE[/red]")
+                return True
+            try:
+                tokens = parse_value_tokens(arg, "Usage: /insert-after NODE-ID VALUE", 2, 2)
+                node_id = nonnegative_int(tokens[0])
+                value = self._convert_item(tokens[1])
+                self._record_undo_state()
+                self.demo.insert_after(node_id, value)
+                self.scroll_offset = 0
+                log.write(f"[green]insert-after(node-{node_id}, {value!r})  {self.show_state_text()}  size={self.structure_size()}[/green]")
+            except (OverflowError, TypeError, ValueError, argparse.ArgumentTypeError) as e:
+                log.write(f"[red]{e}[/red]")
+            return True
+
+        if verb == "/insert-before":
+            if arg is None:
+                log.write("[red]Usage: /insert-before NODE-ID VALUE[/red]")
+                return True
+            try:
+                tokens = parse_value_tokens(arg, "Usage: /insert-before NODE-ID VALUE", 2, 2)
+                node_id = nonnegative_int(tokens[0])
+                value = self._convert_item(tokens[1])
+                self._record_undo_state()
+                self.demo.insert_before(node_id, value)
+                self.scroll_offset = 0
+                log.write(f"[green]insert-before(node-{node_id}, {value!r})  {self.show_state_text()}  size={self.structure_size()}[/green]")
+            except (OverflowError, TypeError, ValueError, argparse.ArgumentTypeError) as e:
+                log.write(f"[red]{e}[/red]")
+            return True
+
+        if verb == "/remove-at":
+            if arg is None:
+                log.write("[red]Usage: /remove-at INDEX[/red]")
+                return True
+            try:
+                index = nonnegative_int(arg)
+                self._record_undo_state()
+                self.demo.remove_at(index)
+                self.scroll_offset = 0
+                log.write(f"[green]remove-at({index})  {self.show_state_text()}  size={self.structure_size()}[/green]")
+            except (IndexError, argparse.ArgumentTypeError, ValueError) as e:
+                log.write(f"[red]{e}[/red]")
+            return True
+
+        if verb == "/remove-node":
+            if arg is None:
+                log.write("[red]Usage: /remove-node NODE-ID[/red]")
+                return True
+            try:
+                node_id = nonnegative_int(arg)
+                self._record_undo_state()
+                self.demo.remove_by_node_id(node_id)
+                self.scroll_offset = 0
+                log.write(f"[green]remove-node(node-{node_id})  {self.show_state_text()}  size={self.structure_size()}[/green]")
+            except (argparse.ArgumentTypeError, ValueError) as e:
+                log.write(f"[red]{e}[/red]")
+            return True
+
         if verb == "/remove-value":
             if arg is None:
                 log.write("[red]Usage: /remove-value <value>[/red]")
@@ -378,12 +458,16 @@ class SinglyLinkedListTUI(BaseLinearStructureTUI):
 
         if verb == "/search":
             if arg is None:
-                log.write("[red]Usage: /search <value>[/red]")
+                log.write("[red]Usage: /search VALUE[/red]")
                 return True
             try:
-                value = self._convert_many(parse_value_tokens(arg, "Usage: /search <value>", 1, 1))[0]
-                found = self.demo.search(value)
-                log.write(f"[cyan]search({value!r}) → {found}[/cyan]")
+                value = self._convert_many(parse_value_tokens(arg, "Usage: /search VALUE", 1, 1))[0]
+                result = self.demo.find(value)
+                if result is None:
+                    log.write(f"[cyan]search({value!r}) → not found[/cyan]")
+                else:
+                    index, node_id = result
+                    log.write(f"[cyan]search({value!r}) → found at index {index}  node-id: {node_id}[/cyan]")
             except TypeError as e:
                 log.write(f"[red]TypeError: {e}[/red]")
             return True
@@ -469,8 +553,6 @@ def main() -> None:
         int_max=args.int_max,
         float_min=args.float_min,
         float_max=args.float_max,
-        capture_dir=args.capture_dir,
-        video_dir=args.video_dir,
     ).run()
 
 
