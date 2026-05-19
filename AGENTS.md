@@ -32,11 +32,11 @@ Pull requests should include a brief description, the data structures or tests c
 
 Several data structures have an interactive terminal UI built with [Textual](https://textual.textualize.io). There are two implementation patterns in use.
 
-### Standalone TUI (`stack_demo_tui.py`)
+### Standalone TUI (`stack_app.py`)
 
-`stack_demo_tui.py` is self-contained: it defines its own `StackDemo` model, panel widget, and full command dispatcher without inheriting from any shared base class. All future shared-base improvements do not automatically reach the stack TUI unless it is later refactored to inherit from `BaseLinearStructureTUI`.
+`stack_app.py` is self-contained: it defines its own `StackDemo` model, panel widget, and full command dispatcher without inheriting from any shared base class. All future shared-base improvements do not automatically reach the stack TUI unless it is later refactored to inherit from `BaseLinearStructureTUI`.
 
-### Base-class TUIs (`tui_common.py`)
+### Base-class TUIs (`common.py`)
 
 All other linear-structure TUIs inherit from `BaseLinearStructureTUI` in `data_structures/tui/common.py`. The base class provides:
 

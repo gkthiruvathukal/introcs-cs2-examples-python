@@ -512,6 +512,6 @@ Expected behavior:
 
 ## Verification Notes
 
-The viewport-selection and argument-parsing logic are covered by `tests/test_stack_demo_tui.py`.
+The viewport-selection and argument-parsing logic are covered by `tests/test_stack_app.py`.
 
 The app also runs under the local project virtual environment created by `make install`.
