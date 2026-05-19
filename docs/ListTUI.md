@@ -20,12 +20,13 @@ Key behavior:
 - the shared shell provides `/save`, `/load`, `/undo`, `/redo`, and `/type`
 
 Core commands:
-- `/append <value> [more ...]`
-- `/insert <index> <value>`
-- `/random <n>`
-- `/remove-value <value>`
-- `/remove-at <index>`
-- `/get <index>`
-- `/set <index> <value>`
+- `/append VALUE [more ...]`
+- `/insert INDEX VALUE`
+- `/remove-value VALUE`
+- `/remove-at INDEX`
+- `/search VALUE`
+- `/get INDEX`
+- `/set INDEX VALUE`
+- `/random N`
 
 The default element type is `int`.

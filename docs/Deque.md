@@ -16,6 +16,8 @@ A deque is a **dynamic, linear, double-ended queue**. Items can be added, remove
 | Peek back | `peek_back()` | Return the back item without removing it | `O(1)` |
 | Update front | `update_front(new_item)` | Replace the front item | `O(1)` |
 | Update back | `update_back(new_item)` | Replace the back item | `O(1)` |
+| Find | `find(item)` | Return the index of the first match, or `None` | `O(n)` |
+| At | `at(index)` | Return the value at zero-based offset from the front | `O(1)` |
 | Size | `size()` | Return the number of items | `O(1)` |
 
 ## Implementation
@@ -61,3 +63,6 @@ The deque tests are in `tests/test_deque_demo.py`. They verify both front and ba
 | `size()` reports the correct count | `test_size` |
 | Removing from an empty deque raises `IndexError` | `test_remove_from_empty` |
 | Updating an empty deque raises `IndexError` | `test_update_empty` |
+| `find` returns the index of an existing item | `test_find_returns_index_of_existing_item` |
+| `find` returns `None` when not found | `test_find_returns_none_when_not_found` |
+| `find` returns the first matching index | `test_find_returns_first_match` |

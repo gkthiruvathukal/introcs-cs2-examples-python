@@ -9,10 +9,12 @@ A list is a **dynamic, linear, indexed sequence**. Items keep insertion order an
 | Operation | Method in this repo | Description | Time Complexity |
 |---|---|---|---|
 | Add | `add(item)` | Append an item to the end | `O(1)` amortized |
+| Insert | `insert(index, item)` | Insert an item at the given index | `O(n)` |
 | Remove by value | `remove(item)` | Remove the first matching item | `O(n)` |
 | Remove by index | `remove_at(index)` | Remove and return the item at an index | `O(n)` |
 | Get | `get(index)` | Return the item at an index | `O(1)` |
 | Update | `update(index, new_value)` | Replace the item at an index | `O(1)` |
+| Find | `find(item)` | Return the index of the first match, or `None` | `O(n)` |
 | Size | `size()` | Return the number of items | `O(1)` |
 
 ## Implementation
@@ -55,3 +57,6 @@ The list tests are in `tests/test_list_demo.py`. They verify indexed access, mut
 | Updating by index changes the expected item | `test_update` |
 | `size()` tracks insertions and removals | `test_size` |
 | Empty/out-of-range index access raises `IndexError` | `test_out_of_range_access` |
+| `find` returns the index of an existing item | `test_find_returns_index_of_existing_item` |
+| `find` returns `None` when not found | `test_find_returns_none_when_not_found` |
+| `find` returns the first matching index | `test_find_returns_first_match` |

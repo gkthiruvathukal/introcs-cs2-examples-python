@@ -15,7 +15,6 @@ It uses the same core stack operations as the stack demo, but presents them in a
 - convenience stack operations such as `at`, `dup`, `swap`, `rotate`, and `clear`
 - snapshot-based `undo` and `redo`
 - per-command timing in the log
-- optional frame capture and video export
 
 ## Running the App
 
@@ -382,11 +381,6 @@ Enter commands in the bottom input box.
 | `/swap` | Swap the top two values |
 | `/rotate` | Rotate the top three values so the third item becomes the new top |
 | `/clear` | Remove all values from the stack |
-| `/session <name>` | Set the active session name for future captured frames |
-| `/capture on` | Start capturing one frame after each command into the active session |
-| `/capture off` | Suspend capturing until it is re-enabled |
-| `/video` | Build an mp4 for the current session, using the command text as the caption track |
-| `/video <session> [seconds]` | Build an mp4 for an explicit session, optionally overriding frame duration |
 | `/save <path>` | Save the current type constraint and stack contents to a session file |
 | `/load <path>` | Load a saved session into a fresh stack, replacing the current stack |
 | `/undo` | Restore the previous stack/type state |
@@ -407,16 +401,6 @@ Enter commands in the bottom input box.
 | `/quit` or `/exit` | Exit the app |
 
 Every submitted command also logs its execution time using an automatically scaled unit such as `ns`, `us`, `ms`, or `s`.
-
-The default session name is `session-stack-demo`.
-
-When capture is enabled:
-
-- `/capture` itself does not create a frame
-- `/session` changes which session future frames use
-- each later command writes a text snapshot and a PNG frame under `.capture/stack/<session>/frames/`
-- `/video` creates `.video/stack/<session>.mp4`
-- the default caption for each frame is the command text that produced it
 
 ## Keybindings
 

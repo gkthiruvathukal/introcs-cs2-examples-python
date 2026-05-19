@@ -11,6 +11,8 @@ A queue is a **dynamic, linear, first-in-first-out (FIFO)** data structure. Elem
 | Enqueue | `enqueue(item)` | Add an item to the back of the queue | `O(1)` |
 | Dequeue | `dequeue()` | Remove and return the front item | `O(1)` |
 | Peek | `peek()` | Return the front item without removing it | `O(1)` |
+| Find | `find(item)` | Return the index of the first match, or `None` | `O(n)` |
+| At | `at(index)` | Return the value at zero-based offset from the front | `O(1)` |
 | Empty check | `is_empty()` | Check whether the queue has no items | `O(1)` |
 | Size | `size()` | Return the number of items | `O(1)` |
 
@@ -58,3 +60,6 @@ The queue tests are in `tests/test_queue_demo.py`. They verify FIFO behavior and
 | `size()` reports the correct count | `test_size` |
 | Dequeuing from an empty queue raises `IndexError` | `test_dequeue_empty` |
 | Peeking into an empty queue raises `IndexError` | `test_peek_empty` |
+| `find` returns the index of an existing item | `test_find_returns_index_of_existing_item` |
+| `find` returns `None` when not found | `test_find_returns_none_when_not_found` |
+| `find` returns the first matching index | `test_find_returns_first_match` |

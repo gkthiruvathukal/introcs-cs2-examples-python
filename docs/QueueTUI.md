@@ -20,13 +20,14 @@ Key behavior:
 - the app supports `/save`, `/load`, `/undo`, `/redo`, and `/type`
 
 Core commands:
-- `/enqueue <value> [more ...]`
-- `/random <n>`
+- `/enqueue VALUE [more ...]`
 - `/dequeue`
 - `/peek`
-- `/at <index>`
+- `/search VALUE`
+- `/at INDEX`
 - `/swap`
 - `/rotate`
+- `/random N`
 - `/clear`
 
 The default element type is `int`. Use `/type str`, `/type bool`, or `/type any` to switch conversion behavior.

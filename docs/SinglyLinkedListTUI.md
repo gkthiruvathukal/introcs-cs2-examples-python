@@ -24,11 +24,16 @@ Key behavior:
 - the shared shell provides `/save`, `/load`, `/undo`, `/redo`, and `/type`
 
 Core commands:
-- `/append <value> [more ...]`
-- `/random <n>`
-- `/remove-value <value>`
-- `/search <value>`
-- `/at <index>`
+- `/append VALUE [more ...]` — add one or more values at the tail
+- `/insert-at INDEX VALUE` — insert before position (0 = new head)
+- `/insert-after NODE-ID VALUE` — insert after the node with that id
+- `/insert-before NODE-ID VALUE` — insert before the node with that id
+- `/remove-value VALUE` — remove the first matching node
+- `/remove-at INDEX` — remove the node at position index
+- `/remove-node NODE-ID` — remove the node with that id
+- `/search VALUE` — search for a value; reports index and node-id when found
+- `/at INDEX` — inspect the node at zero-based offset from the head
+- `/random N`
 
 The default element type is `int`.
 
