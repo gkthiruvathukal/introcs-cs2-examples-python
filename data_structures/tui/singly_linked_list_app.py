@@ -4,7 +4,7 @@ from textual.app import ComposeResult
 from textual.widgets import Footer, Header, Input, RichLog, Static
 
 from data_structures.singly_linked_list import SinglyLinkedList
-from .tui_common import (
+from .common import (
     BaseLinearStructureTUI,
     build_linear_parser,
     format_display_value,

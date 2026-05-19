@@ -1,17 +1,17 @@
 # Deque TUI
 
-`data_structures/tui/deque_demo_tui.py` is an interactive Textual demo for a double-ended queue.
+`data_structures/tui/deque_app.py` is an interactive Textual demo for a double-ended queue.
 
 Run it with:
 
 ```bash
-make run-deque-tui
+make run-deque-app
 ```
 
 or:
 
 ```bash
-.venv/bin/python -m data_structures.tui.deque_demo_tui
+.venv/bin/python -m data_structures.tui.deque_app
 ```
 
 Key behavior:

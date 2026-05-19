@@ -4,7 +4,7 @@ from textual.app import ComposeResult
 from textual.widgets import Footer, Header, Input, RichLog
 
 from data_structures.deque_demo import DequeDemo
-from .tui_common import (
+from .common import (
     BaseLinearStructureTUI,
     LinearPanel,
     build_linear_view,

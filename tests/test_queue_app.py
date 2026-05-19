@@ -2,7 +2,7 @@ import asyncio
 
 from textual.widgets import Input, RichLog
 
-from data_structures.tui.queue_demo_tui import QueueDemoTUI
+from data_structures.tui.queue_app import QueueDemoTUI
 
 
 def test_queue_tui_append_snapshot_and_restore():

@@ -38,7 +38,7 @@ Several data structures have an interactive terminal UI built with [Textual](htt
 
 ### Base-class TUIs (`tui_common.py`)
 
-All other linear-structure TUIs inherit from `BaseLinearStructureTUI` in `data_structures/tui/tui_common.py`. The base class provides:
+All other linear-structure TUIs inherit from `BaseLinearStructureTUI` in `data_structures/tui/common.py`. The base class provides:
 
 - the Textual widget layout (`LinearPanel`, `RichLog`, `Input`, `Header`, `Footer`)
 - the shared command dispatcher (`_dispatch`) covering `/random`, `/clear`, `/save`, `/load`, `/undo`, `/redo`, `/show`, `/type`, scroll commands, and `/help`

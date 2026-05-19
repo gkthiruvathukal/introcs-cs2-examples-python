@@ -2,7 +2,7 @@ import asyncio
 
 from textual.widgets import Input
 
-from data_structures.tui.doubly_linked_list_tui import (
+from data_structures.tui.doubly_linked_list_app import (
     DoublyLinkedListTUI,
     build_dll_cards,
     build_horizontal_dll_view,

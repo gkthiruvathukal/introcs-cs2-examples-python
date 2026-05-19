@@ -1,17 +1,17 @@
 # Doubly Linked List TUI
 
-`data_structures/tui/doubly_linked_list_tui.py` is an interactive Textual demo for doubly linked list behavior.
+`data_structures/tui/doubly_linked_list_app.py` is an interactive Textual demo for doubly linked list behavior.
 
 Run it with:
 
 ```bash
-make run-dll-tui
+make run-dll-app
 ```
 
 or:
 
 ```bash
-.venv/bin/python -m data_structures.tui.doubly_linked_list_tui
+.venv/bin/python -m data_structures.tui.doubly_linked_list_app
 ```
 
 Key behavior:
