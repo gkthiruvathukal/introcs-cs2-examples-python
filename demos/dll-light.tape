@@ -5,7 +5,7 @@ Output demos/dll-light.mp4
 
 Set Theme "Catppuccin Latte"
 Set FontSize 16
-Set FontFamily "Monaco"
+Set FontFamily "DejaVu Sans Mono"
 Set Width 1800
 Set Height 900
 Set Framerate 30
