@@ -10,7 +10,13 @@ TEST_ALIASES = test-bst test-deque test-dict test-dll test-graph test-heap \
 
 .PHONY: install test $(RUN_ALIASES) $(TEST_ALIASES) \
         run-stack-app run-queue-app run-deque-app run-list-app run-sll-app run-dll-app \
-        demo-dll demo-dll-dark demo-dll-light
+        demo-all \
+        demo-stack demo-stack-dark demo-stack-light \
+        demo-queue demo-queue-dark demo-queue-light \
+        demo-deque demo-deque-dark demo-deque-light \
+        demo-list  demo-list-dark  demo-list-light \
+        demo-sll   demo-sll-dark   demo-sll-light \
+        demo-dll   demo-dll-dark   demo-dll-light
 
 # Create the virtual environment
 .venv:
@@ -80,6 +86,46 @@ test-dll-app: test-doubly_linked_list_app
 test-trie:    test-trie_demo
 
 # Demo videos (requires vhs: https://github.com/charmbracelet/vhs)
+demo-stack-dark:
+	vhs demos/stack-dark.tape
+
+demo-stack-light:
+	vhs demos/stack-light.tape
+
+demo-stack: demo-stack-dark demo-stack-light
+
+demo-queue-dark:
+	vhs demos/queue-dark.tape
+
+demo-queue-light:
+	vhs demos/queue-light.tape
+
+demo-queue: demo-queue-dark demo-queue-light
+
+demo-deque-dark:
+	vhs demos/deque-dark.tape
+
+demo-deque-light:
+	vhs demos/deque-light.tape
+
+demo-deque: demo-deque-dark demo-deque-light
+
+demo-list-dark:
+	vhs demos/list-dark.tape
+
+demo-list-light:
+	vhs demos/list-light.tape
+
+demo-list: demo-list-dark demo-list-light
+
+demo-sll-dark:
+	vhs demos/sll-dark.tape
+
+demo-sll-light:
+	vhs demos/sll-light.tape
+
+demo-sll: demo-sll-dark demo-sll-light
+
 demo-dll-dark:
 	vhs demos/dll-dark.tape
 
@@ -87,6 +133,8 @@ demo-dll-light:
 	vhs demos/dll-light.tape
 
 demo-dll: demo-dll-dark demo-dll-light
+
+demo-all: demo-stack demo-queue demo-deque demo-list demo-sll demo-dll
 
 # Run a single non-TUI demo module:  make run-<name>
 #   Note: demo files contain only class definitions (no __main__),

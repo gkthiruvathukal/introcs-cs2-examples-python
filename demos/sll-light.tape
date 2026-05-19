@@ -1,9 +1,9 @@
-# Doubly Linked List — interactive demo (dark theme)
-# Run from project root:  vhs demos/dll-dark.tape
+# Singly Linked List — interactive demo (light theme)
+# Run from project root:  vhs demos/sll-light.tape
 
-Output demos/dll-dark.mp4
+Output demos/sll-light.mp4
 
-Set Theme "TokyoNight"
+Set Theme "Catppuccin Latte"
 Set FontSize 16
 Set FontFamily "DejaVu Sans Mono"
 Set Width 1800
@@ -16,7 +16,7 @@ Set TypingSpeed 29ms
 Env TERM xterm-256color
 
 # ── Launch ──────────────────────────────────────────────────────────────────
-Type ".venv/bin/python -m data_structures.tui.doubly_linked_list_app"
+Type ".venv/bin/python -m data_structures.tui.singly_linked_list_app"
 Enter
 Sleep 10s
 
@@ -33,10 +33,6 @@ Sleep 1.5s
 Type "/at 2"
 Enter
 Sleep 1.5s
-
-Type "/show-backward"
-Enter
-Sleep 2s
 
 # ── Search ──────────────────────────────────────────────────────────────────
 Type "/search 30"
@@ -58,7 +54,7 @@ Type "/insert-before 3 25"
 Enter
 Sleep 2s
 
-# List is now: 6(5) → 1(10) → 7(15) → 2(20) → 8(25) → 3(30) → 4(40) → 5(50)
+# List: 6(5) → 1(10) → 7(15) → 2(20) → 8(25) → 3(30) → 4(40) → 5(50)
 
 # ── Remove by value ─────────────────────────────────────────────────────────
 Type "/remove-value 25"
@@ -75,8 +71,6 @@ Type "/remove-node 7"
 Enter
 Sleep 2s
 
-# List is now: 1(10) → 2(20) → 3(30) → 4(40) → 5(50)
-
 # ── Undo / redo ─────────────────────────────────────────────────────────────
 Type "/undo"
 Enter
@@ -91,7 +85,7 @@ Enter
 Sleep 1.5s
 
 # ── Save current state ───────────────────────────────────────────────────────
-Type "/save /tmp/dll-demo.json"
+Type "/save /tmp/sll-demo.json"
 Enter
 Sleep 1.5s
 
@@ -113,7 +107,7 @@ Type "/clear"
 Enter
 Sleep 1s
 
-Type "/load /tmp/dll-demo.json"
+Type "/load /tmp/sll-demo.json"
 Enter
 Sleep 2s
 

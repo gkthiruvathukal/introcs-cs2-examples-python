@@ -1,9 +1,9 @@
-# Doubly Linked List — interactive demo (dark theme)
-# Run from project root:  vhs demos/dll-dark.tape
+# Queue — interactive demo (light theme)
+# Run from project root:  vhs demos/queue-light.tape
 
-Output demos/dll-dark.mp4
+Output demos/queue-light.mp4
 
-Set Theme "TokyoNight"
+Set Theme "Catppuccin Latte"
 Set FontSize 16
 Set FontFamily "DejaVu Sans Mono"
 Set Width 1800
@@ -16,16 +16,20 @@ Set TypingSpeed 29ms
 Env TERM xterm-256color
 
 # ── Launch ──────────────────────────────────────────────────────────────────
-Type ".venv/bin/python -m data_structures.tui.doubly_linked_list_app"
+Type ".venv/bin/python -m data_structures.tui.queue_app"
 Enter
 Sleep 10s
 
-# ── Build initial list: nodes 1(10) 2(20) 3(30) 4(40) 5(50) ────────────────
-Type "/append 10 20 30 40 50"
+# ── Build queue: 10 at front, 50 at back ────────────────────────────────────
+Type "/enqueue 10 20 30 40 50"
 Enter
 Sleep 2s
 
 # ── Inspect ─────────────────────────────────────────────────────────────────
+Type "/peek"
+Enter
+Sleep 1.5s
+
 Type "/at 0"
 Enter
 Sleep 1.5s
@@ -34,48 +38,33 @@ Type "/at 2"
 Enter
 Sleep 1.5s
 
-Type "/show-backward"
-Enter
-Sleep 2s
-
 # ── Search ──────────────────────────────────────────────────────────────────
 Type "/search 30"
 Enter
 Sleep 1.5s
 
-# ── Insert at head → node 6(5) ──────────────────────────────────────────────
-Type "/insert-at 0 5"
+# ── Dequeue two items ────────────────────────────────────────────────────────
+Type "/dequeue"
+Enter
+Sleep 1.5s
+
+Type "/dequeue"
+Enter
+Sleep 1.5s
+
+# ── Enqueue more ─────────────────────────────────────────────────────────────
+Type "/enqueue 60 70"
 Enter
 Sleep 2s
 
-# ── Insert after node-1 (data=10) → node 7(15) ──────────────────────────────
-Type "/insert-after 1 15"
+# ── Swap and rotate ──────────────────────────────────────────────────────────
+Type "/swap"
 Enter
 Sleep 2s
 
-# ── Insert before node-3 (data=30) → node 8(25) ─────────────────────────────
-Type "/insert-before 3 25"
+Type "/rotate"
 Enter
 Sleep 2s
-
-# List is now: 6(5) → 1(10) → 7(15) → 2(20) → 8(25) → 3(30) → 4(40) → 5(50)
-
-# ── Remove by value ─────────────────────────────────────────────────────────
-Type "/remove-value 25"
-Enter
-Sleep 2s
-
-# ── Remove by position (index 0 = node-6) ───────────────────────────────────
-Type "/remove-at 0"
-Enter
-Sleep 2s
-
-# ── Remove by node id (node-7, data=15) ─────────────────────────────────────
-Type "/remove-node 7"
-Enter
-Sleep 2s
-
-# List is now: 1(10) → 2(20) → 3(30) → 4(40) → 5(50)
 
 # ── Undo / redo ─────────────────────────────────────────────────────────────
 Type "/undo"
@@ -91,7 +80,7 @@ Enter
 Sleep 1.5s
 
 # ── Save current state ───────────────────────────────────────────────────────
-Type "/save /tmp/dll-demo.json"
+Type "/save /tmp/queue-demo.json"
 Enter
 Sleep 1.5s
 
@@ -113,7 +102,7 @@ Type "/clear"
 Enter
 Sleep 1s
 
-Type "/load /tmp/dll-demo.json"
+Type "/load /tmp/queue-demo.json"
 Enter
 Sleep 2s
 
