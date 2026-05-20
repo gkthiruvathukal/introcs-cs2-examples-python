@@ -87,50 +87,50 @@ test-trie:    test-trie_demo
 
 # Demo videos (requires vhs: https://github.com/charmbracelet/vhs)
 demo-stack-dark:
-	vhs demos/stack-dark.tape
+	$(PYTHON) scripts/run_vhs.py demos/stack-dark.tape
 
 demo-stack-light:
-	vhs demos/stack-light.tape
+	$(PYTHON) scripts/run_vhs.py demos/stack-light.tape
 
 demo-stack: demo-stack-dark demo-stack-light
 
 demo-queue-dark:
-	vhs demos/queue-dark.tape
+	$(PYTHON) scripts/run_vhs.py demos/queue-dark.tape
 
 demo-queue-light:
-	vhs demos/queue-light.tape
+	$(PYTHON) scripts/run_vhs.py demos/queue-light.tape
 
 demo-queue: demo-queue-dark demo-queue-light
 
 demo-deque-dark:
-	vhs demos/deque-dark.tape
+	$(PYTHON) scripts/run_vhs.py demos/deque-dark.tape
 
 demo-deque-light:
-	vhs demos/deque-light.tape
+	$(PYTHON) scripts/run_vhs.py demos/deque-light.tape
 
 demo-deque: demo-deque-dark demo-deque-light
 
 demo-list-dark:
-	vhs demos/list-dark.tape
+	$(PYTHON) scripts/run_vhs.py demos/list-dark.tape
 
 demo-list-light:
-	vhs demos/list-light.tape
+	$(PYTHON) scripts/run_vhs.py demos/list-light.tape
 
 demo-list: demo-list-dark demo-list-light
 
 demo-sll-dark:
-	vhs demos/sll-dark.tape
+	$(PYTHON) scripts/run_vhs.py demos/sll-dark.tape
 
 demo-sll-light:
-	vhs demos/sll-light.tape
+	$(PYTHON) scripts/run_vhs.py demos/sll-light.tape
 
 demo-sll: demo-sll-dark demo-sll-light
 
 demo-dll-dark:
-	vhs demos/dll-dark.tape
+	$(PYTHON) scripts/run_vhs.py demos/dll-dark.tape
 
 demo-dll-light:
-	vhs demos/dll-light.tape
+	$(PYTHON) scripts/run_vhs.py demos/dll-light.tape
 
 demo-dll: demo-dll-dark demo-dll-light
 

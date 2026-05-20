@@ -57,6 +57,16 @@ For walkthroughs of the interactive apps, see:
 
 Demo tapes live in `demos/`. Each TUI has a dark-theme tape and a light-theme tape. Generating the videos requires [vhs](https://github.com/charmbracelet/vhs).
 
+The demo build wrapper auto-selects a monospace font by platform:
+- macOS: `Menlo`
+- Linux / GitHub Actions: `DejaVu Sans Mono`
+
+You can override that choice explicitly with `VHS_FONT_FAMILY`, for example:
+
+```bash
+VHS_FONT_FAMILY="SF Mono" make demo-stack
+```
+
 Produce videos for one TUI (dark + light):
 
 ```bash

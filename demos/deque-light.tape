@@ -6,8 +6,8 @@ Output demos/deque-light.mp4
 Set Theme "Catppuccin Latte"
 Set FontSize 16
 Set FontFamily "DejaVu Sans Mono"
-Set Width 1800
-Set Height 900
+Set Width 1920
+Set Height 1200
 Set Framerate 30
 Set Padding 24
 Set WindowBar Colorful
