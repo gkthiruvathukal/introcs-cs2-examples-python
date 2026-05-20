@@ -86,6 +86,9 @@ make demo-all
 
 Individual tape variants are also available, for example `make demo-stack-dark` or `make demo-dll-light`. Generated `.mp4` files are written to `demos/`.
 
+For maintenance details about timing, caption placement, and caption wording, see:
+- `docs/DemoVideoMaintenance.md`
+
 ## All Valid Targets
 
 | Target | Description |

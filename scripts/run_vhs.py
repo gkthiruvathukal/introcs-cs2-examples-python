@@ -31,7 +31,7 @@ OUTPUT_PATTERN = re.compile(r"^Output\s+(.+)$", re.MULTILINE)
 TYPING_SPEED_PATTERN = re.compile(r"^Set TypingSpeed\s+(.+)$")
 TYPE_PATTERN = re.compile(r'^Type(?:@\S+(?:\s+\S+)*)?\s+"(.*)"$')
 SLEEP_PATTERN = re.compile(r"^Sleep\s+(.+)$")
-SECTION_PATTERN = re.compile(r"^#\s*──\s*(.*?)\s*──+\s*$")
+CAPTION_PATTERN = re.compile(r"^#\s*CAPTION:\s*(.+?)\s*$")
 TITLE_PATTERN = re.compile(r"^#\s*(.+?)\s*$")
 WIDTH_PATTERN = re.compile(r"^Set Width\s+(\d+)$", re.MULTILINE)
 HEIGHT_PATTERN = re.compile(r"^Set Height\s+(\d+)$", re.MULTILINE)
@@ -47,6 +47,7 @@ class CaptionCue:
 class CommandCue:
     text: str
     end_seconds: float
+    caption: str | None = None
 
 
 def choose_font_family(system_name: str | None = None) -> str:
@@ -108,11 +109,14 @@ def extract_output_path(tape_text: str) -> Path:
     match = OUTPUT_PATTERN.search(tape_text)
     if not match:
         raise ValueError("Tape file must include an Output path")
-    return Path(match.group(1).strip())
+    raw = match.group(1).strip()
+    if raw.startswith('"') and raw.endswith('"'):
+        raw = raw[1:-1]
+    return Path(raw)
 
 
 def replace_output_path(tape_text: str, output_path: Path) -> str:
-    replacement = f"Output {output_path.as_posix()}"
+    replacement = f'Output "{output_path.as_posix()}"'
     if OUTPUT_PATTERN.search(tape_text):
         return OUTPUT_PATTERN.sub(replacement, tape_text, count=1)
     return f"{replacement}\n{tape_text}"
@@ -158,30 +162,30 @@ def parse_captions(tape_text: str) -> tuple[list[CaptionCue], float]:
     cues: list[CaptionCue] = []
     elapsed = 0.0
     typing_speed = 0.0
-    current_section: str | None = None
-    current_start = 0.0
+    pending_caption: str | None = None
+    active_caption: str | None = None
+    active_start = 0.0
 
-    def close_section(end_time: float) -> None:
-        nonlocal current_section, current_start
-        if current_section and end_time > current_start:
+    def close_caption(end_time: float) -> None:
+        nonlocal active_caption, active_start
+        if active_caption and end_time > active_start:
             cues.append(
                 CaptionCue(
-                    text=current_section,
-                    start_seconds=current_start,
+                    text=active_caption,
+                    start_seconds=active_start,
                     end_seconds=end_time,
                 )
             )
+            active_caption = None
 
     for raw_line in tape_text.splitlines():
         line = raw_line.strip()
         if not line:
             continue
 
-        section_match = SECTION_PATTERN.match(line)
-        if section_match:
-            close_section(elapsed)
-            current_section = section_match.group(1).strip()
-            current_start = elapsed
+        caption_match = CAPTION_PATTERN.match(line)
+        if caption_match:
+            pending_caption = caption_match.group(1).strip()
             continue
 
         speed_match = TYPING_SPEED_PATTERN.match(line)
@@ -191,6 +195,10 @@ def parse_captions(tape_text: str) -> tuple[list[CaptionCue], float]:
 
         type_match = TYPE_PATTERN.match(line)
         if type_match:
+            close_caption(elapsed)
+            active_caption = pending_caption
+            active_start = elapsed
+            pending_caption = None
             elapsed += len(type_match.group(1)) * typing_speed
             continue
 
@@ -203,7 +211,7 @@ def parse_captions(tape_text: str) -> tuple[list[CaptionCue], float]:
             elapsed += parse_duration_seconds(sleep_match.group(1))
             continue
 
-    close_section(elapsed)
+    close_caption(elapsed)
     return cues, elapsed
 
 
@@ -212,16 +220,30 @@ def parse_commands(tape_text: str) -> tuple[list[CommandCue], float]:
     elapsed = 0.0
     typing_speed = 0.0
     active_command: str | None = None
+    pending_caption: str | None = None
+    active_caption: str | None = None
 
     def close_command(end_time: float) -> None:
-        nonlocal active_command
+        nonlocal active_command, active_caption
         if active_command:
-            commands.append(CommandCue(text=active_command, end_seconds=end_time))
+            commands.append(
+                CommandCue(
+                    text=active_command,
+                    end_seconds=end_time,
+                    caption=active_caption,
+                )
+            )
             active_command = None
+            active_caption = None
 
     for raw_line in tape_text.splitlines():
         line = raw_line.strip()
         if not line:
+            continue
+
+        caption_match = CAPTION_PATTERN.match(line)
+        if caption_match:
+            pending_caption = caption_match.group(1).strip()
             continue
 
         speed_match = TYPING_SPEED_PATTERN.match(line)
@@ -233,6 +255,8 @@ def parse_commands(tape_text: str) -> tuple[list[CommandCue], float]:
         if type_match:
             close_command(elapsed)
             active_command = type_match.group(1)
+            active_caption = pending_caption
+            pending_caption = None
             elapsed += len(active_command) * typing_speed
             continue
 
@@ -284,7 +308,7 @@ def build_command_caption_cues(
         previous_end = command.end_seconds
         if adjusted_end <= 0:
             continue
-        caption = command_to_intertitle(command.text)
+        caption = command.caption or command_to_intertitle(command.text)
         if not caption:
             continue
         cues.append(
@@ -680,7 +704,7 @@ def insert_command_intertitles(
                 trim_video_segment(input_video, current_start, segment_end, segment_path)
                 parts.append(segment_path)
 
-            intertitle = command_to_intertitle(command.text)
+            intertitle = command.caption or command_to_intertitle(command.text)
             if intertitle:
                 hold_image = temp_dir / f"hold-{index:02d}.png"
                 hold_video = temp_dir / f"hold-{index:02d}.mp4"
@@ -740,7 +764,6 @@ def postprocess_video(
 ) -> None:
     width, height = extract_dimensions(tape_text)
     title = extract_title(tape_text, tape_path)
-    _, expected_total = parse_captions(tape_text)
     actual_total = ffprobe_duration_seconds(raw_video)
     commands, command_expected_total = parse_commands(tape_text)
     scaled_commands = scale_commands(commands, command_expected_total, actual_total)

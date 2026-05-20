@@ -3,6 +3,7 @@ from pathlib import Path
 from scripts.run_vhs import (
     CaptionCue,
     choose_font_family,
+    CommandCue,
     command_to_intertitle,
     extract_dimensions,
     extract_output_path,
@@ -44,7 +45,12 @@ def test_extract_output_and_replace_output_path():
     tape_text = "Output demos/stack-dark.mp4\nSet Width 1920\n"
     assert extract_output_path(tape_text) == Path("demos/stack-dark.mp4")
     replaced = replace_output_path(tape_text, Path("/tmp/raw.mp4"))
-    assert "Output /tmp/raw.mp4" in replaced
+    assert 'Output "/tmp/raw.mp4"' in replaced
+
+
+def test_extract_output_path_accepts_quoted_path():
+    tape_text = 'Output "/tmp/raw.mp4"\nSet Width 1920\n'
+    assert extract_output_path(tape_text) == Path("/tmp/raw.mp4")
 
 
 def test_extract_title_and_dimensions():
@@ -61,15 +67,15 @@ def test_extract_title_and_dimensions():
     assert extract_dimensions(tape_text) == (1920, 1200)
 
 
-def test_parse_captions_uses_section_comments_and_timing():
+def test_parse_captions_uses_explicit_caption_comments_and_timing():
     tape_text = "\n".join(
         [
             "Set TypingSpeed 100ms",
-            "# ── Launch ──",
+            "# CAPTION: Build the initial stack",
             'Type "abc"',
             "Enter",
             "Sleep 2s",
-            "# ── Inspect ──",
+            "# CAPTION: Inspect the top value",
             'Type "/peek"',
             "Enter",
             "Sleep 1s",
@@ -77,20 +83,22 @@ def test_parse_captions_uses_section_comments_and_timing():
     )
     cues, total = parse_captions(tape_text)
     assert len(cues) == 2
-    assert cues[0].text == "Launch"
+    assert cues[0].text == "Build the initial stack"
     assert cues[0].start_seconds == 0.0
     assert round(cues[0].end_seconds, 2) == 2.45
-    assert cues[1].text == "Inspect"
+    assert cues[1].text == "Inspect the top value"
     assert round(total, 2) == 4.10
 
 
-def test_parse_commands_uses_typed_commands_and_observation_sleep():
+def test_parse_commands_uses_typed_commands_observation_sleep_and_captions():
     tape_text = "\n".join(
         [
             "Set TypingSpeed 100ms",
+            "# CAPTION: Push one value",
             'Type "/push 3"',
             "Enter",
             "Sleep 2s",
+            "# CAPTION: Read the top value",
             'Type "/peek"',
             "Enter",
             "Sleep 1.5s",
@@ -98,9 +106,23 @@ def test_parse_commands_uses_typed_commands_and_observation_sleep():
     )
     commands, total = parse_commands(tape_text)
     assert [command.text for command in commands] == ["/push 3", "/peek"]
+    assert [command.caption for command in commands] == ["Push one value", "Read the top value"]
     assert round(commands[0].end_seconds, 2) == 2.85
     assert round(commands[1].end_seconds, 2) == 5.00
     assert round(total, 2) == 5.00
+
+
+def test_parse_commands_leaves_caption_none_when_no_caption_comment_exists():
+    tape_text = "\n".join(
+        [
+            "Set TypingSpeed 100ms",
+            'Type "/push 3"',
+            "Enter",
+            "Sleep 2s",
+        ]
+    )
+    commands, _ = parse_commands(tape_text)
+    assert commands == [CommandCue(text="/push 3", end_seconds=2.85, caption=None)]
 
 
 def test_command_to_intertitle_skips_launch_and_prettifies_stack_commands():
