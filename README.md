@@ -26,7 +26,7 @@ make test-stack
 make run-stack
 ```
 
-The repo includes interactive Textual TUIs for six data structures. Launch any of them with a dedicated `make run-*-app` target:
+The repo includes interactive Textual TUIs for seven data structures. Launch any of them with a dedicated `make run-*-app` target:
 
 ```bash
 make run-stack-app
@@ -35,6 +35,7 @@ make run-deque-app
 make run-list-app
 make run-sll-app
 make run-dll-app
+make run-uint-app
 ```
 
 You can also run a TUI directly:
@@ -52,6 +53,7 @@ For walkthroughs of the interactive apps, see:
 - `docs/ListTUI.md`
 - `docs/SinglyLinkedListTUI.md`
 - `docs/DoublyLinkedListTUI.md`
+- `docs/UnsignedIntTUI.md`
 
 ## Producing Demo Videos
 
@@ -76,6 +78,7 @@ make demo-deque
 make demo-list
 make demo-sll
 make demo-dll
+make demo-uint
 ```
 
 Produce all videos at once:
@@ -84,7 +87,7 @@ Produce all videos at once:
 make demo-all
 ```
 
-Individual theme variants are also available, for example `make demo-stack-dark` or `make demo-dll-light`. Generated `.mp4` files are written to `demos/`.
+Individual theme variants are also available, for example `make demo-stack-dark` or `make demo-uint-light`. Generated `.mp4` files are written to `demos/`.
 
 For maintenance details about timing, caption placement, and caption wording, see:
 - `docs/DemoVideoMaintenance.md`
@@ -99,7 +102,7 @@ For maintenance details about timing, caption placement, and caption wording, se
 | `make run-<name>-app` | Launch a TUI app interactively |
 | `make test-<name>` | Run a single test module with verbose output |
 | `make demo-<name>` | Produce dark+light demo videos for one TUI (requires [vhs](https://github.com/charmbracelet/vhs)) |
-| `make demo-all` | Produce demo videos for all six TUIs |
+| `make demo-all` | Produce demo videos for all seven TUIs |
 
 Valid `<name>` values (short alias or full name both work):
 
@@ -124,3 +127,5 @@ Valid `<name>` values (short alias or full name both work):
 | `list-app` | `list_app` | `data_structures/tui/list_app.py` | `tests/test_list_app.py` |
 | `dll-app` | `doubly_linked_list_app` | `data_structures/tui/doubly_linked_list_app.py` | `tests/test_doubly_linked_list_app.py` |
 | `trie` | `trie_demo` | `data_structures/trie_demo.py` | `tests/test_trie_demo.py` |
+| `uint` | `unsigned_int` | `data_structures/unsigned_int.py` | `tests/test_unsigned_int.py` |
+| `uint-app` | `unsigned_int_app` | `data_structures/tui/unsigned_int_app.py` | `tests/test_unsigned_int_app.py` |
