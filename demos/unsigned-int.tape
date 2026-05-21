@@ -1,4 +1,4 @@
-# UnsignedInt — interactive demo
+# Unsigned Integer Bit Set — interactive demo
 # Run from project root:  vhs demos/unsigned-int.tape
 
 Output demos/unsigned-int.mp4
