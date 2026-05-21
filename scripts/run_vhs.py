@@ -27,6 +27,7 @@ LAUNCH_TRIM_SECONDS = 3.0
 ENTER_SECONDS = 0.15
 
 FONT_PATTERN = re.compile(r'^Set FontFamily ".*"$', re.MULTILINE)
+THEME_PATTERN = re.compile(r'^Set Theme ".*"$', re.MULTILINE)
 OUTPUT_PATTERN = re.compile(r"^Output\s+(.+)$", re.MULTILINE)
 TYPING_SPEED_PATTERN = re.compile(r"^Set TypingSpeed\s+(.+)$")
 TYPE_PATTERN = re.compile(r'^Type(?:@\S+(?:\s+\S+)*)?\s+"(.*)"$')
@@ -35,6 +36,19 @@ CAPTION_PATTERN = re.compile(r"^#\s*CAPTION:\s*(.+?)\s*$")
 TITLE_PATTERN = re.compile(r"^#\s*(.+?)\s*$")
 WIDTH_PATTERN = re.compile(r"^Set Width\s+(\d+)$", re.MULTILINE)
 HEIGHT_PATTERN = re.compile(r"^Set Height\s+(\d+)$", re.MULTILINE)
+
+THEMES = {
+    "dark": "TokyoNight",
+    "light": "Catppuccin Latte",
+}
+
+TEXTUAL_THEMES = {
+    "dark": "textual-dark",
+    "light": "textual-light",
+}
+
+TEXTUAL_THEME_PATTERN = re.compile(r'^Env TEXTUAL_THEME .*$', re.MULTILINE)
+ENV_TERM_PATTERN = re.compile(r'^(Env TERM .*)$', re.MULTILINE)
 
 @dataclass
 class CaptionCue:
@@ -103,6 +117,26 @@ def render_tape_text(tape_text: str, font_family: str) -> str:
     if FONT_PATTERN.search(tape_text):
         return FONT_PATTERN.sub(replacement, tape_text, count=1)
     return f'{replacement}\n{tape_text}'
+
+
+def render_theme(tape_text: str, theme_name: str) -> str:
+    replacement = f'Set Theme "{theme_name}"'
+    if THEME_PATTERN.search(tape_text):
+        return THEME_PATTERN.sub(replacement, tape_text, count=1)
+    return f'{replacement}\n{tape_text}'
+
+
+def render_textual_theme(tape_text: str, textual_theme: str) -> str:
+    new_line = f"Env TEXTUAL_THEME {textual_theme}"
+    if TEXTUAL_THEME_PATTERN.search(tape_text):
+        return TEXTUAL_THEME_PATTERN.sub(new_line, tape_text)
+    if ENV_TERM_PATTERN.search(tape_text):
+        return ENV_TERM_PATTERN.sub(r'\1\n' + new_line, tape_text)
+    return tape_text + f"\n{new_line}"
+
+
+def apply_mode_suffix(output_path: Path, mode: str) -> Path:
+    return output_path.with_stem(f"{output_path.stem}-{mode}")
 
 
 def extract_output_path(tape_text: str) -> Path:
@@ -815,6 +849,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Credit line to render on the opening card.",
     )
     parser.add_argument(
+        "--mode",
+        choices=["dark", "light"],
+        help="Theme mode: dark=TokyoNight, light=Catppuccin Latte. Appends -dark/-light to the output filename.",
+    )
+    parser.add_argument(
         "--print-font",
         action="store_true",
         help="Print the chosen font family and exit.",
@@ -833,11 +872,16 @@ def main(argv: list[str] | None = None) -> int:
     tape_path = args.tape.resolve()
     original_tape_text = tape_path.read_text(encoding="utf-8")
     output_path = extract_output_path(original_tape_text)
+    if args.mode:
+        output_path = apply_mode_suffix(output_path, args.mode)
 
     with tempfile.TemporaryDirectory() as temp_dir_name:
         temp_dir = Path(temp_dir_name)
         raw_output_path = temp_dir / output_path.name
         rendered_text = render_tape_text(original_tape_text, font_family)
+        if args.mode:
+            rendered_text = render_theme(rendered_text, THEMES[args.mode])
+            rendered_text = render_textual_theme(rendered_text, TEXTUAL_THEMES[args.mode])
         rendered_text = replace_output_path(rendered_text, raw_output_path)
 
         with tempfile.NamedTemporaryFile(

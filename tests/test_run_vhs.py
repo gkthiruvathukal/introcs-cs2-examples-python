@@ -2,6 +2,7 @@ from pathlib import Path
 
 from scripts.run_vhs import (
     CaptionCue,
+    apply_mode_suffix,
     choose_font_family,
     CommandCue,
     command_to_intertitle,
@@ -12,6 +13,8 @@ from scripts.run_vhs import (
     parse_captions,
     parse_commands,
     render_tape_text,
+    render_textual_theme,
+    render_theme,
     replace_output_path,
     scale_cues,
 )
@@ -137,3 +140,39 @@ def test_scale_cues_and_timestamp_formatting():
     scaled = scale_cues(cues, expected_total=4.0, actual_total=8.0)
     assert scaled[0].end_seconds == 4.0
     assert format_srt_timestamp(4.125) == "00:00:04,125"
+
+
+def test_render_theme_replaces_existing_theme():
+    tape_text = 'Set Theme "TokyoNight"\nSet FontSize 16\n'
+    rendered = render_theme(tape_text, "Catppuccin Latte")
+    assert 'Set Theme "Catppuccin Latte"' in rendered
+    assert 'Set Theme "TokyoNight"' not in rendered
+
+
+def test_render_theme_inserts_when_absent():
+    tape_text = "Set FontSize 16\nSet Width 1920\n"
+    rendered = render_theme(tape_text, "TokyoNight")
+    assert 'Set Theme "TokyoNight"' in rendered
+
+
+def test_apply_mode_suffix_dark():
+    assert apply_mode_suffix(Path("demos/stack.mp4"), "dark") == Path("demos/stack-dark.mp4")
+
+
+def test_apply_mode_suffix_light():
+    assert apply_mode_suffix(Path("demos/queue.mp4"), "light") == Path("demos/queue-light.mp4")
+
+
+def test_render_textual_theme_inserts_after_env_term():
+    tape_text = "Set Width 1920\nEnv TERM xterm-256color\nType \"echo hi\"\n"
+    result = render_textual_theme(tape_text, "textual-light")
+    lines = result.splitlines()
+    term_idx = next(i for i, l in enumerate(lines) if l.startswith("Env TERM"))
+    assert lines[term_idx + 1] == "Env TEXTUAL_THEME textual-light"
+
+
+def test_render_textual_theme_replaces_existing():
+    tape_text = "Env TERM xterm-256color\nEnv TEXTUAL_THEME textual-dark\n"
+    result = render_textual_theme(tape_text, "textual-light")
+    assert "Env TEXTUAL_THEME textual-light" in result
+    assert "Env TEXTUAL_THEME textual-dark" not in result

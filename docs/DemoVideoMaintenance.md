@@ -22,9 +22,9 @@ For maintainability, the caption wording now lives in the `.tape` files themselv
 One stack sample:
 
 ```bash
-make demo-stack-dark
-make demo-stack-light
-make demo-stack
+make demo-stack-dark   # runs demos/stack.tape --mode dark  → demos/stack-dark.mp4
+make demo-stack-light  # runs demos/stack.tape --mode light → demos/stack-light.mp4
+make demo-stack        # both
 ```
 
 All demos:
@@ -215,5 +215,5 @@ When tuning a demo video:
 2. edit the `# CAPTION:` comments in the tape if the wording needs to change
 3. edit `burn_captions_into_video(...)` if the caption position needs to change
 4. edit `create_caption_overlay(...)` if the caption size or typography needs to change
-5. rebuild one demo first, usually `make demo-stack-dark`
+5. rebuild one demo first, usually `make demo-stack-dark` (runs `demos/stack.tape --mode dark`)
 6. inspect before rebuilding everything

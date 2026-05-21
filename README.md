@@ -55,7 +55,7 @@ For walkthroughs of the interactive apps, see:
 
 ## Producing Demo Videos
 
-Demo tapes live in `demos/`. Each TUI has a dark-theme tape and a light-theme tape. Generating the videos requires [vhs](https://github.com/charmbracelet/vhs).
+Demo tapes live in `demos/`. Each TUI has a single canonical tape file; `--mode dark|light` selects the theme at build time. Generating the videos requires [vhs](https://github.com/charmbracelet/vhs).
 
 The demo build wrapper auto-selects a monospace font by platform:
 - macOS: `Menlo`
@@ -84,7 +84,7 @@ Produce all videos at once:
 make demo-all
 ```
 
-Individual tape variants are also available, for example `make demo-stack-dark` or `make demo-dll-light`. Generated `.mp4` files are written to `demos/`.
+Individual theme variants are also available, for example `make demo-stack-dark` or `make demo-dll-light`. Generated `.mp4` files are written to `demos/`.
 
 For maintenance details about timing, caption placement, and caption wording, see:
 - `docs/DemoVideoMaintenance.md`

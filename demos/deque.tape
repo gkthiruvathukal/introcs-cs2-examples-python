@@ -1,9 +1,9 @@
-# Deque — interactive demo (light theme)
-# Run from project root:  vhs demos/deque-light.tape
+# Deque — interactive demo
+# Run from project root:  vhs demos/deque.tape
 
-Output demos/deque-light.mp4
+Output demos/deque.mp4
 
-Set Theme "Catppuccin Latte"
+Set Theme "TokyoNight"
 Set FontSize 16
 Set FontFamily "DejaVu Sans Mono"
 Set Width 1920

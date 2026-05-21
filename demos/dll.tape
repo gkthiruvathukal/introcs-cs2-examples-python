@@ -1,9 +1,9 @@
-# Doubly Linked List — interactive demo (light theme)
-# Run from project root:  vhs demos/dll-light.tape
+# Doubly Linked List — interactive demo
+# Run from project root:  vhs demos/dll.tape
 
-Output demos/dll-light.mp4
+Output demos/dll.mp4
 
-Set Theme "Catppuccin Latte"
+Set Theme "TokyoNight"
 Set FontSize 16
 Set FontFamily "DejaVu Sans Mono"
 Set Width 1920
@@ -18,7 +18,7 @@ Env TERM xterm-256color
 # ── Launch ──────────────────────────────────────────────────────────────────
 Type ".venv/bin/python -m data_structures.tui.doubly_linked_list_app"
 Enter
-Sleep 10s
+Sleep 4s
 
 # ── Build initial list: nodes 1(10) 2(20) 3(30) 4(40) 5(50) ────────────────
 # CAPTION: Append 5 values to build the initial doubly linked list
@@ -30,12 +30,12 @@ Sleep 2s
 # CAPTION: Inspect the head node
 Type "/at 0"
 Enter
-Sleep 1.5s
+Sleep 2s
 
 # CAPTION: Inspect a middle node
 Type "/at 2"
 Enter
-Sleep 1.5s
+Sleep 2s
 
 # CAPTION: Traverse the list backward from the tail
 Type "/show-backward"
@@ -46,7 +46,7 @@ Sleep 2s
 # CAPTION: Search for the value 30
 Type "/search 30"
 Enter
-Sleep 1.5s
+Sleep 2s
 
 # ── Insert at head → node 6(5) ──────────────────────────────────────────────
 # CAPTION: Insert a new head node with value 5
@@ -92,23 +92,23 @@ Sleep 2s
 # CAPTION: Undo the previous change
 Type "/undo"
 Enter
-Sleep 1.5s
+Sleep 2s
 
 # CAPTION: Undo one more change
 Type "/undo"
 Enter
-Sleep 1.5s
+Sleep 2s
 
 # CAPTION: Redo the last undone change
 Type "/redo"
 Enter
-Sleep 1.5s
+Sleep 2s
 
 # ── Save current state ───────────────────────────────────────────────────────
 # CAPTION: Save the current doubly linked list session
 Type "/save /tmp/dll-demo.json"
 Enter
-Sleep 1.5s
+Sleep 2s
 
 # ── Switch to strings and generate random values ─────────────────────────────
 # CAPTION: Clear the list

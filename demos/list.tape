@@ -1,7 +1,7 @@
-# Queue — interactive demo (dark theme)
-# Run from project root:  vhs demos/queue-dark.tape
+# List — interactive demo
+# Run from project root:  vhs demos/list.tape
 
-Output demos/queue-dark.mp4
+Output demos/list.mp4
 
 Set Theme "TokyoNight"
 Set FontSize 16
@@ -16,53 +16,37 @@ Set TypingSpeed 29ms
 Env TERM xterm-256color
 
 # ── Launch ──────────────────────────────────────────────────────────────────
-Type ".venv/bin/python -m data_structures.tui.queue_app"
+Type ".venv/bin/python -m data_structures.tui.list_app"
 Enter
 Sleep 10s
 
-# ── Build queue: 10 at front, 50 at back ────────────────────────────────────
-Type "/enqueue 10 20 30 40 50"
+# ── Build list ───────────────────────────────────────────────────────────────
+Type "/append 10 20 30 40 50"
 Enter
 Sleep 2s
-
-# ── Inspect ─────────────────────────────────────────────────────────────────
-Type "/peek"
-Enter
-Sleep 1.5s
-
-Type "/at 0"
-Enter
-Sleep 1.5s
-
-Type "/at 2"
-Enter
-Sleep 1.5s
 
 # ── Search ──────────────────────────────────────────────────────────────────
 Type "/search 30"
 Enter
 Sleep 1.5s
 
-# ── Dequeue two items ────────────────────────────────────────────────────────
-Type "/dequeue"
-Enter
-Sleep 1.5s
-
-Type "/dequeue"
-Enter
-Sleep 1.5s
-
-# ── Enqueue more ─────────────────────────────────────────────────────────────
-Type "/enqueue 60 70"
+# ── Insert at index 2 → [10, 20, 25, 30, 40, 50] ────────────────────────────
+Type "/insert 2 25"
 Enter
 Sleep 2s
 
-# ── Swap and rotate ──────────────────────────────────────────────────────────
-Type "/swap"
+# ── Set value at index 0 → [5, 20, 25, 30, 40, 50] ──────────────────────────
+Type "/set 0 5"
 Enter
 Sleep 2s
 
-Type "/rotate"
+# ── Remove by value ─────────────────────────────────────────────────────────
+Type "/remove-value 25"
+Enter
+Sleep 2s
+
+# ── Remove by position ───────────────────────────────────────────────────────
+Type "/remove-at 4"
 Enter
 Sleep 2s
 
@@ -80,7 +64,7 @@ Enter
 Sleep 1.5s
 
 # ── Save current state ───────────────────────────────────────────────────────
-Type "/save /tmp/queue-demo.json"
+Type "/save /tmp/list-demo.json"
 Enter
 Sleep 1.5s
 
@@ -102,7 +86,7 @@ Type "/clear"
 Enter
 Sleep 1s
 
-Type "/load /tmp/queue-demo.json"
+Type "/load /tmp/list-demo.json"
 Enter
 Sleep 2s
 

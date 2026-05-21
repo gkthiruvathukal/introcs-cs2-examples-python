@@ -1,9 +1,9 @@
-# Queue — interactive demo (light theme)
-# Run from project root:  vhs demos/queue-light.tape
+# Queue — interactive demo
+# Run from project root:  vhs demos/queue.tape
 
-Output demos/queue-light.mp4
+Output demos/queue.mp4
 
-Set Theme "Catppuccin Latte"
+Set Theme "TokyoNight"
 Set FontSize 16
 Set FontFamily "DejaVu Sans Mono"
 Set Width 1920
